@@ -53,8 +53,13 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
   const [query, setQuery] = useState('')
 
   const results = useMemo(() => {
+    // Locations booking natively here list first; Momence-routed ones follow.
+    const internalFirst = (a: ChooserLocation, b: ChooserLocation) =>
+      Number(b.bookingProvider === 'INTERNAL') - Number(a.bookingProvider === 'INTERNAL') ||
+      a.name.localeCompare(b.name)
+
     const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean)
-    if (tokens.length === 0) return locations
+    if (tokens.length === 0) return [...locations].sort(internalFirst)
     return locations
       .map((location) => {
         let score = 0
@@ -66,7 +71,7 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
         return { location, score }
       })
       .filter((r) => r.score > 0)
-      .sort((a, b) => b.score - a.score || a.location.name.localeCompare(b.location.name))
+      .sort((a, b) => b.score - a.score || internalFirst(a.location, b.location))
       .map((r) => r.location)
   }, [locations, query])
 
@@ -88,6 +93,7 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
       ) : (
         <ul className="flex flex-col gap-3">
           {results.map((location) => {
+            const external = location.bookingProvider === 'MOMENCE'
             const inner = (
               <span className="flex min-h-11 items-center justify-between gap-4">
                 <span className="flex flex-col">
@@ -96,8 +102,17 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
                     {location.city}, {location.state} {location.postalCode}
                   </span>
                 </span>
-                <span aria-hidden className="text-gray-300">
-                  →
+                <span className="flex items-center gap-2">
+                  {external ? (
+                    <span className="text-xs text-gray-400">books on plunj.co</span>
+                  ) : (
+                    <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-medium text-paper">
+                      Book here
+                    </span>
+                  )}
+                  <span aria-hidden className="text-gray-300">
+                    {external ? '↗' : '→'}
+                  </span>
                 </span>
               </span>
             )
