@@ -1,0 +1,132 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EMAIL templates > booking-cancelled with credit 1`] = `
+{
+  "html": "<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111;">
+<p style="font-size:14px;letter-spacing:0.2em;font-weight:700;margin:0 0 24px;">PLUNJ</p>
+<h1 style="font-size:20px;margin:0 0 16px;">Booking cancelled</h1><p style="font-size:15px;line-height:1.5;">Hey Maya, your booking at <strong>PLUNJ Provo</strong> for Sat, Aug 9 at 7:00 AM has been cancelled.</p><p style="font-size:15px;line-height:1.5;">A <strong>$10.50</strong> credit is on your account for next time — it applies automatically at checkout.</p><p style="font-size:15px;line-height:1.5;">Hope to see you back in the water soon.</p>
+<p style="font-size:12px;color:#777;margin:32px 0 0;">PLUNJ &middot; cold plunge &amp; contrast therapy</p>
+</div>",
+  "subject": "Your PLUNJ booking is cancelled — Provo",
+  "text": "Hey Maya,
+
+Your booking at PLUNJ Provo for Sat, Aug 9 at 7:00 AM has been cancelled.
+
+A $10.50 credit is on your account for next time — it applies automatically at checkout.
+
+Hope to see you back in the water soon.
+PLUNJ",
+}
+`;
+
+exports[`EMAIL templates > booking-confirmed with waiver 1`] = `
+{
+  "html": "<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111;">
+<p style="font-size:14px;letter-spacing:0.2em;font-weight:700;margin:0 0 24px;">PLUNJ</p>
+<h1 style="font-size:20px;margin:0 0 16px;">You're booked, Maya.</h1><p style="font-size:15px;line-height:1.5;margin:0 0 16px;"><strong>PLUNJ Provo</strong><br>Sat, Aug 9 at 7:00 AM<br>3 seats</p><p style="font-size:15px;line-height:1.5;"><a href="https://plunj.co/book/manage/abc123" style="color:#111;">Manage your booking</a></p><p style="font-size:15px;line-height:1.5;">One thing left — <a href="https://plunj.co/book/waiver/abc123" style="color:#111;">sign your waiver</a> before you arrive.</p><p style="font-size:15px;line-height:1.5;">See you in the water.</p>
+<p style="font-size:12px;color:#777;margin:32px 0 0;">PLUNJ &middot; cold plunge &amp; contrast therapy</p>
+</div>",
+  "subject": "You're booked — PLUNJ Provo",
+  "text": "Hey Maya,
+
+You're booked at PLUNJ Provo.
+
+When: Sat, Aug 9 at 7:00 AM
+Seats: 3 seats
+
+Manage your booking: https://plunj.co/book/manage/abc123
+
+One thing left — sign your waiver before you arrive: https://plunj.co/book/waiver/abc123
+
+See you in the water.
+PLUNJ",
+}
+`;
+
+exports[`EMAIL templates > booking-confirmed without waiver has no waiver mention 1`] = `
+{
+  "html": "<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111;">
+<p style="font-size:14px;letter-spacing:0.2em;font-weight:700;margin:0 0 24px;">PLUNJ</p>
+<h1 style="font-size:20px;margin:0 0 16px;">You're booked, Maya.</h1><p style="font-size:15px;line-height:1.5;margin:0 0 16px;"><strong>PLUNJ Provo</strong><br>Sat, Aug 9 at 7:00 AM<br>3 seats</p><p style="font-size:15px;line-height:1.5;"><a href="https://plunj.co/book/manage/abc123" style="color:#111;">Manage your booking</a></p><p style="font-size:15px;line-height:1.5;">See you in the water.</p>
+<p style="font-size:12px;color:#777;margin:32px 0 0;">PLUNJ &middot; cold plunge &amp; contrast therapy</p>
+</div>",
+  "subject": "You're booked — PLUNJ Provo",
+  "text": "Hey Maya,
+
+You're booked at PLUNJ Provo.
+
+When: Sat, Aug 9 at 7:00 AM
+Seats: 3 seats
+
+Manage your booking: https://plunj.co/book/manage/abc123
+
+See you in the water.
+PLUNJ",
+}
+`;
+
+exports[`EMAIL templates > receipt 1`] = `
+{
+  "html": "<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111;">
+<p style="font-size:14px;letter-spacing:0.2em;font-weight:700;margin:0 0 24px;">PLUNJ</p>
+<h1 style="font-size:20px;margin:0 0 8px;">Your receipt</h1><p style="font-size:15px;line-height:1.5;margin:0 0 16px;">Thanks for plunging with us at <strong>PLUNJ Provo</strong>, Maya.</p><table style="width:100%;border-collapse:collapse;border-bottom:1px solid #ddd;"><tr><td style="padding:6px 0;font-size:14px;">2 &times; Communal plunge</td><td style="padding:6px 0;font-size:14px;text-align:right;">$50.00</td></tr><tr><td style="padding:6px 0;font-size:14px;">1 &times; Sauna add-on</td><td style="padding:6px 0;font-size:14px;text-align:right;">$15.00</td></tr></table><table style="width:100%;border-collapse:collapse;margin-top:8px;"><tr><td style="padding:4px 0;font-size:14px;color:#555;">Subtotal</td><td style="padding:4px 0;font-size:14px;text-align:right;">$65.00</td></tr><tr><td style="padding:4px 0;font-size:14px;color:#555;">Discount (10% founders club)</td><td style="padding:4px 0;font-size:14px;text-align:right;">-$6.50</td></tr><tr><td style="padding:4px 0;font-size:14px;color:#555;">Tax</td><td style="padding:4px 0;font-size:14px;text-align:right;">$4.68</td></tr><tr><td style="padding:4px 0;font-size:14px;color:#555;">Tip</td><td style="padding:4px 0;font-size:14px;text-align:right;">$10.00</td></tr><tr><td style="padding:4px 0;font-size:14px;font-weight:700;">Total</td><td style="padding:4px 0;font-size:14px;text-align:right;font-weight:700;">$73.18</td></tr></table>
+<p style="font-size:12px;color:#777;margin:32px 0 0;">PLUNJ &middot; cold plunge &amp; contrast therapy</p>
+</div>",
+  "subject": "Your PLUNJ receipt — Provo",
+  "text": "Hey Maya,
+
+Thanks for plunging with us at PLUNJ Provo. Here's your receipt.
+
+2 x Communal plunge — $50.00
+1 x Sauna add-on — $15.00
+
+Subtotal: $65.00
+Discount (10% founders club): -$6.50
+Tax: $4.68
+Tip: $10.00
+Total: $73.18
+
+See you next time.
+PLUNJ",
+}
+`;
+
+exports[`SMS templates > booking-cancelled with credit formats cents as $XX.XX 1`] = `
+"Hey Maya, your booking at PLUNJ Provo for Sat, Aug 9 at 7:00 AM has been cancelled.
+A $25.00 credit is on your account for next time — it applies automatically at checkout.
+Hope to see you back in the water soon."
+`;
+
+exports[`SMS templates > booking-cancelled without credit omits credit line 1`] = `
+"Hey Maya, your booking at PLUNJ Provo for Sat, Aug 9 at 7:00 AM has been cancelled.
+Hope to see you back in the water soon."
+`;
+
+exports[`SMS templates > booking-confirmed with waiver link 1`] = `
+"Hey Maya, you're booked at PLUNJ Provo — Sat, Aug 9 at 7:00 AM, 3 seats.
+Manage your booking: https://plunj.co/book/manage/abc123
+One thing left — sign your waiver: https://plunj.co/book/waiver/abc123"
+`;
+
+exports[`SMS templates > booking-confirmed without waiver 1`] = `
+"Hey Maya, you're booked at PLUNJ Provo — Sat, Aug 9 at 7:00 AM, 3 seats.
+Manage your booking: https://plunj.co/book/manage/abc123"
+`;
+
+exports[`SMS templates > booking-reminder-2h with arrival note 1`] = `
+"Hey Maya, see you at PLUNJ Provo at 7:00 AM.
+Park behind the building and come in the side door."
+`;
+
+exports[`SMS templates > booking-reminder-2h without arrival note 1`] = `"Hey Maya, see you at PLUNJ Provo at 7:00 AM."`;
+
+exports[`SMS templates > booking-reminder-24h with everyone signed omits waiver line 1`] = `"Hey Maya, quick reminder — your plunge at PLUNJ Provo is tomorrow, Sat, Aug 9 at 7:00 AM."`;
+
+exports[`SMS templates > booking-reminder-24h with unsigned waivers 1`] = `
+"Hey Maya, quick reminder — your plunge at PLUNJ Provo is tomorrow, Sat, Aug 9 at 7:00 AM.
+2 of your group still need to sign the waiver: https://plunj.co/book/waiver/abc123"
+`;
+
+exports[`SMS templates > waiver-request with and without guest name 1`] = `"Hi Jonah, you're joining a plunge at PLUNJ Provo. Please sign your waiver before you arrive: https://plunj.co/book/waiver/xyz"`;
+
+exports[`SMS templates > waiver-request with and without guest name 2`] = `"Hi, you're joining a plunge at PLUNJ Provo. Please sign your waiver before you arrive: https://plunj.co/book/waiver/xyz"`;

@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+/*
+ * PLUNJ design tokens — black / white / gray Nordic minimalism.
+ * Color is reserved for semantic states (waiver status, availability, errors).
+ */
+@theme {
+  --color-ink: #0a0a0a;
+  --color-paper: #fafafa;
+  --color-gray-50: #f7f7f7;
+  --color-gray-100: #ededed;
+  --color-gray-200: #dcdcdc;
+  --color-gray-300: #c2c2c2;
+  --color-gray-400: #9a9a9a;
+  --color-gray-500: #6f6f6f;
+  --color-gray-600: #525252;
+  --color-gray-700: #3d3d3d;
+  --color-gray-800: #262626;
+  --color-gray-900: #141414;
+
+  /* Semantic states — the only color in the system */
+  --color-ok: #1a7f4e;
+  --color-warn: #b45309;
+  --color-danger: #b3261e;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 0.75rem;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Breakdown rows (discount / tip) sliding into the itemized total. */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

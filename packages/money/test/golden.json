@@ -1,0 +1,2190 @@
+[
+  {
+    "name": "percent-20-off-47-50",
+    "note": "The classic trap: 20% of $47.50 is exactly $9.50, no rounding drift allowed.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Contrast session",
+          "qty": 1,
+          "unitPriceCents": 4750,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE20", "type": "PERCENT", "valueBps": 2000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 4750,
+      "discountCents": 950,
+      "discountDescription": "20% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 3800,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 4750,
+          "discountAllocatedCents": 950,
+          "taxCents": 0,
+          "lineTotalCents": 3800
+        }
+      ]
+    }
+  },
+  {
+    "name": "ten-pct-off-three-33-33-lines",
+    "note": "1/3-style split: 10% of 9999 rounds to 1000; largest-remainder gives the tie cent to the first line and the allocations sum exactly.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session A",
+          "qty": 1,
+          "unitPriceCents": 3333,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "DROP_IN",
+          "description": "Session B",
+          "qty": 1,
+          "unitPriceCents": 3333,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "DROP_IN",
+          "description": "Session C",
+          "qty": 1,
+          "unitPriceCents": 3333,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 9999,
+      "discountCents": 1000,
+      "discountDescription": "10% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 8999,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 3333,
+          "discountAllocatedCents": 334,
+          "taxCents": 0,
+          "lineTotalCents": 2999
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 3333,
+          "discountAllocatedCents": 333,
+          "taxCents": 0,
+          "lineTotalCents": 3000
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 3333,
+          "discountAllocatedCents": 333,
+          "taxCents": 0,
+          "lineTotalCents": 3000
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-discount-exceeds-subtotal-clamps",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Towel",
+          "qty": 1,
+          "unitPriceCents": 500,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "TENOFF", "type": "FIXED_CENTS", "valueCents": 1000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 500,
+      "discountCents": 500,
+      "discountDescription": "$10.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 0,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 500,
+          "discountAllocatedCents": 500,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-discount-simple",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 2000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "FIVEOFF", "type": "FIXED_CENTS", "valueCents": 500 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 2000,
+      "discountCents": 500,
+      "discountDescription": "$5.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 1500,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 2000,
+          "discountAllocatedCents": 500,
+          "taxCents": 0,
+          "lineTotalCents": 1500
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-skips-ineligible-line",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 15000,
+      "discountCents": 1000,
+      "discountDescription": "10% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 14000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 1000,
+          "taxCents": 0,
+          "lineTotalCents": 9000
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-clamps-to-eligible-subtotal-only",
+    "note": "The $20 code can only consume the $10 eligible line; the ineligible buyout is untouched.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1000,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "BUYOUT",
+          "description": "Private buyout",
+          "qty": 1,
+          "unitPriceCents": 9000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "TWENTYOFF", "type": "FIXED_CENTS", "valueCents": 2000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 10000,
+      "discountCents": 1000,
+      "discountDescription": "$20.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 9000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1000,
+          "discountAllocatedCents": 1000,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 9000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 9000
+        }
+      ]
+    }
+  },
+  {
+    "name": "gift-card-line-is-tax-exempt",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 8000,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 13000,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 800,
+      "tipCents": 0,
+      "totalCents": 13800,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 8000,
+          "discountAllocatedCents": 0,
+          "taxCents": 800,
+          "lineTotalCents": 8800
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        }
+      ]
+    }
+  },
+  {
+    "name": "gift-card-alongside-discounted-taxed-session",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 8000,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE25", "type": "PERCENT", "valueBps": 2500 },
+      "taxRateBps": 800
+    },
+    "expected": {
+      "subtotalCents": 13000,
+      "discountCents": 2000,
+      "discountDescription": "25% off",
+      "taxCents": 480,
+      "tipCents": 0,
+      "totalCents": 11480,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 8000,
+          "discountAllocatedCents": 2000,
+          "taxCents": 480,
+          "lineTotalCents": 6480
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        }
+      ]
+    }
+  },
+  {
+    "name": "zero-percent-tax",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Robe",
+          "qty": 1,
+          "unitPriceCents": 12345,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 12345,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 12345,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 12345,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 12345
+        }
+      ]
+    }
+  },
+  {
+    "name": "max-30-pct-tax-rounds-half-up",
+    "note": "999 * 30% = 299.7 rounds up to 300 at the max allowed tax bound.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 999,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 3000
+    },
+    "expected": {
+      "subtotalCents": 999,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 300,
+      "tipCents": 0,
+      "totalCents": 1299,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 999,
+          "discountAllocatedCents": 0,
+          "taxCents": 300,
+          "lineTotalCents": 1299
+        }
+      ]
+    }
+  },
+  {
+    "name": "tax-exact-half-cent-rounds-up",
+    "note": "1005 * 10% = 100.5 -> 101.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Salts",
+          "qty": 1,
+          "unitPriceCents": 1005,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 1005,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 101,
+      "tipCents": 0,
+      "totalCents": 1106,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1005,
+          "discountAllocatedCents": 0,
+          "taxCents": 101,
+          "lineTotalCents": 1106
+        }
+      ]
+    }
+  },
+  {
+    "name": "tax-below-half-cent-rounds-down",
+    "note": "1004 * 10% = 100.4 -> 100.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Salts",
+          "qty": 1,
+          "unitPriceCents": 1004,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 1004,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 100,
+      "tipCents": 0,
+      "totalCents": 1104,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1004,
+          "discountAllocatedCents": 0,
+          "taxCents": 100,
+          "lineTotalCents": 1104
+        }
+      ]
+    }
+  },
+  {
+    "name": "tip-only-no-lines",
+    "input": {
+      "lines": [],
+      "taxRateBps": 0,
+      "tipCents": 1500
+    },
+    "expected": {
+      "subtotalCents": 0,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 0,
+      "tipCents": 1500,
+      "totalCents": 1500,
+      "lines": []
+    }
+  },
+  {
+    "name": "tip-only-free-line",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Comped session",
+          "qty": 1,
+          "unitPriceCents": 0,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 1000,
+      "tipCents": 2000
+    },
+    "expected": {
+      "subtotalCents": 0,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 0,
+      "tipCents": 2000,
+      "totalCents": 2000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 0,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "tip-added-after-tax-untaxed",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 725,
+      "tipCents": 1800
+    },
+    "expected": {
+      "subtotalCents": 10000,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 725,
+      "tipCents": 1800,
+      "totalCents": 12525,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 0,
+          "taxCents": 725,
+          "lineTotalCents": 10725
+        }
+      ]
+    }
+  },
+  {
+    "name": "qty-three-percent-discount",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session x3",
+          "qty": 3,
+          "unitPriceCents": 2500,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE20", "type": "PERCENT", "valueBps": 2000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 7500,
+      "discountCents": 1500,
+      "discountDescription": "20% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 6000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 7500,
+          "discountAllocatedCents": 1500,
+          "taxCents": 0,
+          "lineTotalCents": 6000
+        }
+      ]
+    }
+  },
+  {
+    "name": "qty-twelve-fixed-discount",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Electrolyte pack x12",
+          "qty": 12,
+          "unitPriceCents": 250,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "CASE350", "type": "FIXED_CENTS", "valueCents": 350 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 3000,
+      "discountCents": 350,
+      "discountDescription": "$3.50 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 2650,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 3000,
+          "discountAllocatedCents": 350,
+          "taxCents": 0,
+          "lineTotalCents": 2650
+        }
+      ]
+    }
+  },
+  {
+    "name": "single-cent-line-50-pct-rounds-up",
+    "note": "50% of 1 cent = 0.5 rounds up to 1: the whole cent is discounted.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Penny item",
+          "qty": 1,
+          "unitPriceCents": 1,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "HALF", "type": "PERCENT", "valueBps": 5000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 1,
+      "discountCents": 1,
+      "discountDescription": "50% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 0,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1,
+          "discountAllocatedCents": 1,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "three-single-cent-lines-50-pct",
+    "note": "50% of 3 cents = 1.5 -> 2; equal remainders, so the first two lines in order each take a cent.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Penny A",
+          "qty": 1,
+          "unitPriceCents": 1,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "Penny B",
+          "qty": 1,
+          "unitPriceCents": 1,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "RETAIL",
+          "description": "Penny C",
+          "qty": 1,
+          "unitPriceCents": 1,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "HALF", "type": "PERCENT", "valueBps": 5000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 3,
+      "discountCents": 2,
+      "discountDescription": "50% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 1,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1,
+          "discountAllocatedCents": 1,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 1,
+          "discountAllocatedCents": 1,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 1,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 1
+        }
+      ]
+    }
+  },
+  {
+    "name": "momence-complaint-template",
+    "note": "Reconstruction of the Momence bug class: a 15% code on three $10.03 lines. Naive per-line rounding gives 150+150+150 = 450 cents off, silently under-applying the advertised percent. The correct compute-once discount is roundHalfUp(3009 * 15%) = 451, allocated 151/150/150 by largest remainder.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session A",
+          "qty": 1,
+          "unitPriceCents": 1003,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "DROP_IN",
+          "description": "Session B",
+          "qty": 1,
+          "unitPriceCents": 1003,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "DROP_IN",
+          "description": "Session C",
+          "qty": 1,
+          "unitPriceCents": 1003,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "PLUNJ15", "type": "PERCENT", "valueBps": 1500 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 3009,
+      "discountCents": 451,
+      "discountDescription": "15% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 2558,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1003,
+          "discountAllocatedCents": 151,
+          "taxCents": 0,
+          "lineTotalCents": 852
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 1003,
+          "discountAllocatedCents": 150,
+          "taxCents": 0,
+          "lineTotalCents": 853
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 1003,
+          "discountAllocatedCents": 150,
+          "taxCents": 0,
+          "lineTotalCents": 853
+        }
+      ]
+    }
+  },
+  {
+    "name": "hundred-pct-discount-zeroes-eligible-lines",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1234,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "PACK",
+          "description": "5-pack",
+          "qty": 1,
+          "unitPriceCents": 5678,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "COMP", "type": "PERCENT", "valueBps": 10000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 6912,
+      "discountCents": 6912,
+      "discountDescription": "100% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 0,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1234,
+          "discountAllocatedCents": 1234,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 5678,
+          "discountAllocatedCents": 5678,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "one-bps-discount",
+    "note": "0.01% of $100.00 is exactly 1 cent.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "PACK",
+          "description": "10-pack",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "TINY", "type": "PERCENT", "valueBps": 1 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 10000,
+      "discountCents": 1,
+      "discountDescription": "0.01% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 9999,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 1,
+          "taxCents": 0,
+          "lineTotalCents": 9999
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-discount-exact-half-rounds-up",
+    "note": "5% of 1050 = 52.5 -> 53.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1050,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE5", "type": "PERCENT", "valueBps": 500 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 1050,
+      "discountCents": 53,
+      "discountDescription": "5% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 997,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1050,
+          "discountAllocatedCents": 53,
+          "taxCents": 0,
+          "lineTotalCents": 997
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-discount-below-half-rounds-down",
+    "note": "5% of 1049 = 52.45 -> 52.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1049,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE5", "type": "PERCENT", "valueBps": 500 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 1049,
+      "discountCents": 52,
+      "discountDescription": "5% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 997,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1049,
+          "discountAllocatedCents": 52,
+          "taxCents": 0,
+          "lineTotalCents": 997
+        }
+      ]
+    }
+  },
+  {
+    "name": "no-discount",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1000,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "Hat",
+          "qty": 1,
+          "unitPriceCents": 2000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 3000,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 3000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 1000
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 2000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 2000
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-with-no-eligible-lines",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "HALF", "type": "PERCENT", "valueBps": 5000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 5000,
+      "discountCents": 0,
+      "discountDescription": "50% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 5000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-with-no-eligible-lines",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "ONEOFF", "type": "FIXED_CENTS", "valueCents": 100 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 5000,
+      "discountCents": 0,
+      "discountDescription": "$1.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 5000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-allocation-exact-proportions",
+    "note": "100 across weights 300/100 splits exactly 75/25 with no remainders.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Big",
+          "qty": 1,
+          "unitPriceCents": 300,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "Small",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "ONEOFF", "type": "FIXED_CENTS", "valueCents": 100 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 400,
+      "discountCents": 100,
+      "discountDescription": "$1.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 300,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 300,
+          "discountAllocatedCents": 75,
+          "taxCents": 0,
+          "lineTotalCents": 225
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 25,
+          "taxCents": 0,
+          "lineTotalCents": 75
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-allocation-equal-thirds-remainder",
+    "note": "100 across three equal lines: 33/33/33 plus the leftover cent to the first line.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "A",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "B",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "RETAIL",
+          "description": "C",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "ONEOFF", "type": "FIXED_CENTS", "valueCents": 100 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 300,
+      "discountCents": 100,
+      "discountDescription": "$1.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 200,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 34,
+          "taxCents": 0,
+          "lineTotalCents": 66
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 33,
+          "taxCents": 0,
+          "lineTotalCents": 67
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 33,
+          "taxCents": 0,
+          "lineTotalCents": 67
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-allocation-larger-remainder-wins",
+    "note": "101 across 500/250: bases 67/33, remainders 250/500 — the leftover cent goes to line b despite line a being first.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Big",
+          "qty": 1,
+          "unitPriceCents": 500,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "Small",
+          "qty": 1,
+          "unitPriceCents": 250,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "OFF101", "type": "FIXED_CENTS", "valueCents": 101 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 750,
+      "discountCents": 101,
+      "discountDescription": "$1.01 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 649,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 500,
+          "discountAllocatedCents": 67,
+          "taxCents": 0,
+          "lineTotalCents": 433
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 250,
+          "discountAllocatedCents": 34,
+          "taxCents": 0,
+          "lineTotalCents": 216
+        }
+      ]
+    }
+  },
+  {
+    "name": "discount-applies-before-tax",
+    "note": "Tax is computed on the discounted amount: (10000 - 2000) * 10% = 800, not 1000.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE20", "type": "PERCENT", "valueBps": 2000 },
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 10000,
+      "discountCents": 2000,
+      "discountDescription": "20% off",
+      "taxCents": 800,
+      "tipCents": 0,
+      "totalCents": 8800,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 2000,
+          "taxCents": 800,
+          "lineTotalCents": 8800
+        }
+      ]
+    }
+  },
+  {
+    "name": "discount-on-nontaxable-line",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "MEMBERSHIP_CYCLE",
+          "description": "Monthly membership",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE20", "type": "PERCENT", "valueBps": 2000 },
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 10000,
+      "discountCents": 2000,
+      "discountDescription": "20% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 8000,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 2000,
+          "taxCents": 0,
+          "lineTotalCents": 8000
+        }
+      ]
+    }
+  },
+  {
+    "name": "allocation-across-taxable-and-nontaxable",
+    "note": "10% of 9999 = 1000; bases 333/666, remainders 3333/6666 so line b takes the leftover cent; tax applies only to line a's discounted amount.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 3333,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "MEMBERSHIP_CYCLE",
+          "description": "Membership",
+          "qty": 1,
+          "unitPriceCents": 6666,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 9999,
+      "discountCents": 1000,
+      "discountDescription": "10% off",
+      "taxCents": 300,
+      "tipCents": 0,
+      "totalCents": 9299,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 3333,
+          "discountAllocatedCents": 333,
+          "taxCents": 300,
+          "lineTotalCents": 3300
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 6666,
+          "discountAllocatedCents": 667,
+          "taxCents": 0,
+          "lineTotalCents": 5999
+        }
+      ]
+    }
+  },
+  {
+    "name": "kitchen-sink-four-lines",
+    "note": "15% on eligible 24500 = 3675 exactly, split 675/3000; per-line tax at 8.5% on discounted amounts; tip last.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 4500,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "PACK",
+          "description": "10-pack",
+          "qty": 1,
+          "unitPriceCents": 20000,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "GIFT_CARD",
+          "description": "Gift card",
+          "qty": 1,
+          "unitPriceCents": 5000,
+          "taxable": false,
+          "discountEligible": false
+        },
+        {
+          "id": "e",
+          "kind": "FEE",
+          "description": "Booking fee",
+          "qty": 1,
+          "unitPriceCents": 250,
+          "taxable": true,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "PLUNJ15", "type": "PERCENT", "valueBps": 1500 },
+      "taxRateBps": 850,
+      "tipCents": 1000
+    },
+    "expected": {
+      "subtotalCents": 29750,
+      "discountCents": 3675,
+      "discountDescription": "15% off",
+      "taxCents": 1791,
+      "tipCents": 1000,
+      "totalCents": 28866,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 4500,
+          "discountAllocatedCents": 675,
+          "taxCents": 325,
+          "lineTotalCents": 4150
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 20000,
+          "discountAllocatedCents": 3000,
+          "taxCents": 1445,
+          "lineTotalCents": 18445
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 5000,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 5000
+        },
+        {
+          "id": "e",
+          "lineSubtotalCents": 250,
+          "discountAllocatedCents": 0,
+          "taxCents": 21,
+          "lineTotalCents": 271
+        }
+      ]
+    }
+  },
+  {
+    "name": "buyout-fixed-discount-with-tax",
+    "note": "(60000 - 5000) * 7.25% = 3987.5 -> 3988.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "BUYOUT",
+          "description": "Private buyout",
+          "qty": 1,
+          "unitPriceCents": 60000,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "FIFTYOFF", "type": "FIXED_CENTS", "valueCents": 5000 },
+      "taxRateBps": 725
+    },
+    "expected": {
+      "subtotalCents": 60000,
+      "discountCents": 5000,
+      "discountDescription": "$50.00 off",
+      "taxCents": 3988,
+      "tipCents": 0,
+      "totalCents": 58988,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 60000,
+          "discountAllocatedCents": 5000,
+          "taxCents": 3988,
+          "lineTotalCents": 58988
+        }
+      ]
+    }
+  },
+  {
+    "name": "membership-cycle-founding-50-pct",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "MEMBERSHIP_CYCLE",
+          "description": "Founding member monthly",
+          "qty": 1,
+          "unitPriceCents": 14900,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "FOUNDING", "type": "PERCENT", "valueBps": 5000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 14900,
+      "discountCents": 7450,
+      "discountDescription": "50% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 7450,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 14900,
+          "discountAllocatedCents": 7450,
+          "taxCents": 0,
+          "lineTotalCents": 7450
+        }
+      ]
+    }
+  },
+  {
+    "name": "retail-qty-two-six-pct-tax",
+    "note": "3198 * 6% = 191.88 -> 192.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Water bottle x2",
+          "qty": 2,
+          "unitPriceCents": 1599,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 600
+    },
+    "expected": {
+      "subtotalCents": 3198,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 192,
+      "tipCents": 0,
+      "totalCents": 3390,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 3198,
+          "discountAllocatedCents": 0,
+          "taxCents": 192,
+          "lineTotalCents": 3390
+        }
+      ]
+    }
+  },
+  {
+    "name": "fee-line-not-discount-eligible",
+    "note": "A $100 fixed code consumes the whole eligible session but never touches the fee.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 10000,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "FEE",
+          "description": "Late change fee",
+          "qty": 1,
+          "unitPriceCents": 300,
+          "taxable": false,
+          "discountEligible": false
+        }
+      ],
+      "discount": { "id": "d", "code": "HUNDO", "type": "FIXED_CENTS", "valueCents": 10000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 10300,
+      "discountCents": 10000,
+      "discountDescription": "$100.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 300,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 10000,
+          "discountAllocatedCents": 10000,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 300,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 300
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-33-33-bps",
+    "note": "33.33% of 100 = 33.33 -> 33.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Sticker",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "THIRD", "type": "PERCENT", "valueBps": 3333 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 100,
+      "discountCents": 33,
+      "discountDescription": "33.33% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 67,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 33,
+          "taxCents": 0,
+          "lineTotalCents": 67
+        }
+      ]
+    }
+  },
+  {
+    "name": "percent-rounds-to-zero-on-one-cent",
+    "note": "0.01% of 1 cent = 0.0001 -> 0: a discount can legitimately apply zero cents.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "Penny item",
+          "qty": 1,
+          "unitPriceCents": 1,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "TINY", "type": "PERCENT", "valueBps": 1 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 1,
+      "discountCents": 0,
+      "discountDescription": "0.01% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 1,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 1
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-one-cent-discount",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 999,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "PENNY", "type": "FIXED_CENTS", "valueCents": 1 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 999,
+      "discountCents": 1,
+      "discountDescription": "$0.01 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 998,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 999,
+          "discountAllocatedCents": 1,
+          "taxCents": 0,
+          "lineTotalCents": 998
+        }
+      ]
+    }
+  },
+  {
+    "name": "equal-remainder-tie-breaks-by-line-order",
+    "note": "25 across 100/100: bases 12/12, equal remainders — the first line in order takes the extra cent.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "A",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "B",
+          "qty": 1,
+          "unitPriceCents": 100,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "QUARTER", "type": "FIXED_CENTS", "valueCents": 25 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 200,
+      "discountCents": 25,
+      "discountDescription": "$0.25 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 175,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 13,
+          "taxCents": 0,
+          "lineTotalCents": 87
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 100,
+          "discountAllocatedCents": 12,
+          "taxCents": 0,
+          "lineTotalCents": 88
+        }
+      ]
+    }
+  },
+  {
+    "name": "zero-price-line-gets-zero-allocation",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Comped session",
+          "qty": 1,
+          "unitPriceCents": 0,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 1000,
+      "discountCents": 100,
+      "discountDescription": "10% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 900,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 0,
+          "discountAllocatedCents": 0,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 1000,
+          "discountAllocatedCents": 100,
+          "taxCents": 0,
+          "lineTotalCents": 900
+        }
+      ]
+    }
+  },
+  {
+    "name": "tax-on-fully-discounted-line-is-zero",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 1000,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "TENOFF", "type": "FIXED_CENTS", "valueCents": 1000 },
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 1000,
+      "discountCents": 1000,
+      "discountDescription": "$10.00 off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 0,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 1000,
+          "discountAllocatedCents": 1000,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "per-line-tax-not-order-level-tax",
+    "note": "Three 105c lines at 5%: per-line tax is 5.25 -> 5 each, total 15. Order-level tax would be 315 * 5% = 15.75 -> 16. The spec is per-line.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "RETAIL",
+          "description": "A",
+          "qty": 1,
+          "unitPriceCents": 105,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "B",
+          "qty": 1,
+          "unitPriceCents": 105,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "c",
+          "kind": "RETAIL",
+          "description": "C",
+          "qty": 1,
+          "unitPriceCents": 105,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "taxRateBps": 500
+    },
+    "expected": {
+      "subtotalCents": 315,
+      "discountCents": 0,
+      "discountDescription": null,
+      "taxCents": 15,
+      "tipCents": 0,
+      "totalCents": 330,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 105,
+          "discountAllocatedCents": 0,
+          "taxCents": 5,
+          "lineTotalCents": 110
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 105,
+          "discountAllocatedCents": 0,
+          "taxCents": 5,
+          "lineTotalCents": 110
+        },
+        {
+          "id": "c",
+          "lineSubtotalCents": 105,
+          "discountAllocatedCents": 0,
+          "taxCents": 5,
+          "lineTotalCents": 110
+        }
+      ]
+    }
+  },
+  {
+    "name": "fixed-discount-with-tip",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 3000,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "FIVEOFF", "type": "FIXED_CENTS", "valueCents": 500 },
+      "taxRateBps": 0,
+      "tipCents": 700
+    },
+    "expected": {
+      "subtotalCents": 3000,
+      "discountCents": 500,
+      "discountDescription": "$5.00 off",
+      "taxCents": 0,
+      "tipCents": 700,
+      "totalCents": 3200,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 3000,
+          "discountAllocatedCents": 500,
+          "taxCents": 0,
+          "lineTotalCents": 2500
+        }
+      ]
+    }
+  },
+  {
+    "name": "allocation-follows-line-order-reversed",
+    "note": "Same lines as allocation-across-taxable-and-nontaxable but in reverse order: the leftover cent still follows the largest remainder (line b), so each id keeps the same allocation.",
+    "input": {
+      "lines": [
+        {
+          "id": "b",
+          "kind": "MEMBERSHIP_CYCLE",
+          "description": "Membership",
+          "qty": 1,
+          "unitPriceCents": 6666,
+          "taxable": false,
+          "discountEligible": true
+        },
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 3333,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "SAVE10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 1000
+    },
+    "expected": {
+      "subtotalCents": 9999,
+      "discountCents": 1000,
+      "discountDescription": "10% off",
+      "taxCents": 300,
+      "tipCents": 0,
+      "totalCents": 9299,
+      "lines": [
+        {
+          "id": "b",
+          "lineSubtotalCents": 6666,
+          "discountAllocatedCents": 667,
+          "taxCents": 0,
+          "lineTotalCents": 5999
+        },
+        {
+          "id": "a",
+          "lineSubtotalCents": 3333,
+          "discountAllocatedCents": 333,
+          "taxCents": 300,
+          "lineTotalCents": 3300
+        }
+      ]
+    }
+  },
+  {
+    "name": "hundred-pct-discount-with-max-tax",
+    "note": "Fully discounted taxable line at the 30% bound: tax base is zero, so tax is zero.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Session",
+          "qty": 1,
+          "unitPriceCents": 2000,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "COMP", "type": "PERCENT", "valueBps": 10000 },
+      "taxRateBps": 3000
+    },
+    "expected": {
+      "subtotalCents": 2000,
+      "discountCents": 2000,
+      "discountDescription": "100% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 0,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 2000,
+          "discountAllocatedCents": 2000,
+          "taxCents": 0,
+          "lineTotalCents": 0
+        }
+      ]
+    }
+  },
+  {
+    "name": "qty-100-seven-pct",
+    "note": "7% of 99900 = 6993 exactly.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Corporate block x100",
+          "qty": 100,
+          "unitPriceCents": 999,
+          "taxable": false,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "CORP7", "type": "PERCENT", "valueBps": 700 },
+      "taxRateBps": 0
+    },
+    "expected": {
+      "subtotalCents": 99900,
+      "discountCents": 6993,
+      "discountDescription": "7% off",
+      "taxCents": 0,
+      "tipCents": 0,
+      "totalCents": 92907,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 99900,
+          "discountAllocatedCents": 6993,
+          "taxCents": 0,
+          "lineTotalCents": 92907
+        }
+      ]
+    }
+  },
+  {
+    "name": "realistic-checkout-two-lines-tax-tip",
+    "note": "WELCOME10 on 9499 eligible = 949.9 -> 950, split 700/250 (line b has the larger remainder); tax 469 + 168 on the discounted amounts; tip last.",
+    "input": {
+      "lines": [
+        {
+          "id": "a",
+          "kind": "DROP_IN",
+          "description": "Contrast session x2",
+          "qty": 2,
+          "unitPriceCents": 3500,
+          "taxable": true,
+          "discountEligible": true
+        },
+        {
+          "id": "b",
+          "kind": "RETAIL",
+          "description": "Water bottle",
+          "qty": 1,
+          "unitPriceCents": 2499,
+          "taxable": true,
+          "discountEligible": true
+        }
+      ],
+      "discount": { "id": "d", "code": "WELCOME10", "type": "PERCENT", "valueBps": 1000 },
+      "taxRateBps": 745,
+      "tipCents": 500
+    },
+    "expected": {
+      "subtotalCents": 9499,
+      "discountCents": 950,
+      "discountDescription": "10% off",
+      "taxCents": 637,
+      "tipCents": 500,
+      "totalCents": 9686,
+      "lines": [
+        {
+          "id": "a",
+          "lineSubtotalCents": 7000,
+          "discountAllocatedCents": 700,
+          "taxCents": 469,
+          "lineTotalCents": 6769
+        },
+        {
+          "id": "b",
+          "lineSubtotalCents": 2499,
+          "discountAllocatedCents": 250,
+          "taxCents": 168,
+          "lineTotalCents": 2417
+        }
+      ]
+    }
+  }
+]

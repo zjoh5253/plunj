@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @plunj/db db:generate
+
+      - name: Install Playwright chromium
+        run: pnpm --filter @plunj/web exec playwright install --with-deps chromium
+
+      - name: E2E tests
+        # Boots an ephemeral Postgres (port 54333) + `next dev`; the runner's
+        # preinstalled postgres binaries are found via the pgserver fallback list.
+        run: pnpm --filter @plunj/web e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
+
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @plunj/db db:generate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit + integration tests
+        # availability/api suites boot an ephemeral Postgres; the runner's
+        # preinstalled binaries are found via the pgserver.ts fallback list.
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

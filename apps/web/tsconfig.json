@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "jsx": "preserve",
+    "noEmit": true,
+    "incremental": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@plunj/db": ["../../packages/db/src/index.ts"],
+      "@plunj/money": ["../../packages/money/src/index.ts"],
+      "@plunj/availability": ["../../packages/availability/src/index.ts"],
+      "@plunj/notifications": ["../../packages/notifications/src/index.ts"],
+      "@plunj/payments": ["../../packages/payments/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
