@@ -37,6 +37,7 @@ import {
   activeLocationBySlug,
   asOutboxTx,
   currentWaiverDocument,
+  requireNormalizedPhone,
   upsertCustomerByPhone,
   waiverStatusFor,
 } from '../shared.js'
@@ -511,9 +512,10 @@ export const publicRouter = router({
           })
         }
 
+        const signerPhone = requireNormalizedPhone(input.signer.phone)
         const signer = await upsertCustomerByPhone(db, {
           ...splitName(input.signer.name),
-          phone: input.signer.phone,
+          phone: signerPhone,
         })
         if (input.signer.dateOfBirth !== undefined) {
           await db.customer.update({
@@ -544,7 +546,7 @@ export const publicRouter = router({
               kind: CustomerKind.GUEST,
               firstName: minorName.firstName,
               lastName: minorName.lastName ?? null,
-              phone: input.signer.phone,
+              phone: signerPhone,
               dateOfBirth: new Date(`${input.minor.dateOfBirth}T00:00:00Z`),
             },
           })
@@ -769,17 +771,21 @@ export const publicRouter = router({
     request: publicProcedure
       .input(z.object({ phone: z.string().min(7) }))
       .mutation(async ({ ctx, input }) => {
-        await ctx.auth.api.sendPhoneNumberOTP({ body: { phoneNumber: input.phone } })
+        // Better Auth stores the phone it is given — always hand it the
+        // canonical E.164 form so auth_users.phone_number never splits.
+        const phone = requireNormalizedPhone(input.phone)
+        await ctx.auth.api.sendPhoneNumberOTP({ body: { phoneNumber: phone } })
         return { sent: true }
       }),
 
     verify: publicProcedure
       .input(z.object({ phone: z.string().min(7), code: z.string().min(4) }))
       .mutation(async ({ ctx, input }) => {
+        const phone = requireNormalizedPhone(input.phone)
         let verified: { token: string | null; user?: { id: string } | null }
         try {
           verified = (await ctx.auth.api.verifyPhoneNumber({
-            body: { phoneNumber: input.phone, code: input.code },
+            body: { phoneNumber: phone, code: input.code },
           })) as { token: string | null; user?: { id: string } | null }
         } catch {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid or expired code' })
@@ -791,7 +797,7 @@ export const publicRouter = router({
 
         // First OTP verification claims the guest history for this phone.
         const { db } = ctx
-        const matches = await db.customer.findMany({ where: { phone: input.phone } })
+        const matches = await db.customer.findMany({ where: { phone } })
         const claimable =
           matches.find((c) => c.authUserId === user.id) ??
           matches.find((c) => c.kind === CustomerKind.ACCOUNT && c.authUserId === null) ??
@@ -809,7 +815,7 @@ export const publicRouter = router({
                 kind: CustomerKind.ACCOUNT,
                 firstName: 'PLUNJ',
                 lastName: 'Member',
-                phone: input.phone,
+                phone,
                 authUserId: user.id,
               },
             })
@@ -817,7 +823,7 @@ export const publicRouter = router({
         // Staff sign in with the same phone OTP: link an unclaimed StaffUser
         // row by phone on first verification so staffProcedure can find it.
         await db.staffUser.updateMany({
-          where: { phone: input.phone, active: true, authUserId: null },
+          where: { phone, active: true, authUserId: null },
           data: { authUserId: user.id },
         })
 

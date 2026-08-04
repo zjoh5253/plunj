@@ -1,5 +1,6 @@
 import { createCallerFactory, router } from '../trpc.js'
 import { adminRouter } from './admin.js'
+import { corporateRouter } from './corporate.js'
 import { deskRouter } from './desk.js'
 import { publicRouter } from './public.js'
 
@@ -7,6 +8,7 @@ export const appRouter = router({
   public: publicRouter,
   desk: deskRouter,
   admin: adminRouter,
+  corporate: corporateRouter,
 })
 
 export type AppRouter = typeof appRouter

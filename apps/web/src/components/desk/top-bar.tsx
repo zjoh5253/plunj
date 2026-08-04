@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { authClient } from '@/components/desk/auth-client'
-import { formatDateKeyLong, localDateKey } from '@/lib/format'
+import { formatDateKeyLong, formatPhoneUS, localDateKey } from '@/lib/format'
 
 export interface DeskLocation {
   slug: string
@@ -64,7 +64,7 @@ export function DeskTopBar({ location }: { location: DeskLocation }) {
         <div className="flex items-center gap-2">
           {staffPhone ? (
             <span className="hidden text-xs text-gray-400 tabular-nums sm:inline">
-              {staffPhone}
+              {formatPhoneUS(staffPhone)}
             </span>
           ) : null}
           <button

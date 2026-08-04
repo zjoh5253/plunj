@@ -12,6 +12,8 @@ import { useState } from 'react'
 import { authClient } from '@/components/desk/auth-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { formatPhoneUS } from '@/lib/format'
 
 /** Only allow internal app paths — never absolute URLs (open-redirect guard). */
 function safeNext(raw: string | null): string {
@@ -30,10 +32,13 @@ export function SignInClient() {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Better Auth stores the phone it receives — always send canonical E.164.
+  const e164 = `+1${phone}`
+
   const sendCode = async () => {
     setPending(true)
     setError(null)
-    const { error: err } = await authClient.phoneNumber.sendOtp({ phoneNumber: phone.trim() })
+    const { error: err } = await authClient.phoneNumber.sendOtp({ phoneNumber: e164 })
     setPending(false)
     if (err) {
       setError(err.message ?? 'Could not send the code. Check the number and try again.')
@@ -46,7 +51,7 @@ export function SignInClient() {
     setPending(true)
     setError(null)
     const { error: err } = await authClient.phoneNumber.verify({
-      phoneNumber: phone.trim(),
+      phoneNumber: e164,
       code: value.trim(),
     })
     setPending(false)
@@ -69,7 +74,7 @@ export function SignInClient() {
       >
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight">Enter the code</h1>
-          <p className="text-gray-500">We texted a 6-digit code to {phone.trim()}.</p>
+          <p className="text-gray-500">We texted a 6-digit code to {formatPhoneUS(e164)}.</p>
         </div>
         <Input
           label="Code"
@@ -110,25 +115,21 @@ export function SignInClient() {
       className="flex flex-col gap-5"
       onSubmit={(e) => {
         e.preventDefault()
-        if (phone.trim().length >= 7 && !pending) void sendCode()
+        if (phone.length === 10 && !pending) void sendCode()
       }}
     >
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Staff sign-in</h1>
         <p className="text-gray-500">We&apos;ll text you a one-time code. No passwords.</p>
       </div>
-      <Input
+      <PhoneInput
         label="Mobile number"
-        type="tel"
-        autoComplete="tel"
-        inputMode="tel"
-        placeholder="(555) 555-5555"
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        onChange={setPhone}
         autoFocus
         {...(error ? { error } : {})}
       />
-      <Button type="submit" size="lg" loading={pending} disabled={phone.trim().length < 7}>
+      <Button type="submit" size="lg" loading={pending} disabled={phone.length !== 10}>
         Text me a code
       </Button>
     </form>

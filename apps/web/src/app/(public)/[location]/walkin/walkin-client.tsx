@@ -11,6 +11,7 @@ import { Markdown } from '@/components/booking/markdown'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import type { LocationDetail, WaiverDoc } from '@/lib/api-types'
 import { domainError } from '@/lib/api-types'
 import { useTRPC } from '@/lib/trpc/client'
@@ -43,7 +44,7 @@ export function WalkinClient({ location, doc }: { location: LocationDetail; doc:
     )
   }
 
-  const canSign = name.trim().length > 0 && phone.trim().length >= 7 && (doc === null || agreed)
+  const canSign = name.trim().length > 0 && phone.length === 10 && (doc === null || agreed)
 
   return (
     <form
@@ -54,7 +55,7 @@ export function WalkinClient({ location, doc }: { location: LocationDetail; doc:
         setError(null)
         signMutation.mutate({
           walkIn: { locationSlug: location.slug },
-          signer: { name: name.trim(), phone: phone.trim() },
+          signer: { name: name.trim(), phone: `+1${phone}` },
           signatureKind: 'TYPED',
           typedName: name.trim(),
         })
@@ -72,21 +73,13 @@ export function WalkinClient({ location, doc }: { location: LocationDetail; doc:
         onChange={(e) => setName(e.target.value)}
         required
       />
-      <Input
-        label="Mobile number"
-        type="tel"
-        autoComplete="tel"
-        inputMode="tel"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        required
-      />
+      <PhoneInput label="Mobile number" value={phone} onChange={setPhone} required />
       {/* A2P 10DLC opt-in disclosure — carrier-required language; keep in sync
           with the Twilio campaign registration. */}
       <p className="text-xs leading-relaxed text-gray-500">
-        By continuing, you agree to receive booking-related texts from PLUNJ (confirmations,
-        waiver links, reminders). Message frequency varies. Message &amp; data rates may apply.
-        Reply STOP to cancel or HELP for help.{' '}
+        By continuing, you agree to receive booking-related texts from PLUNJ (confirmations, waiver
+        links, reminders). Message frequency varies. Message &amp; data rates may apply. Reply STOP
+        to cancel or HELP for help.{' '}
         <a
           href="https://plunj.co/privacy-policy"
           className="underline"

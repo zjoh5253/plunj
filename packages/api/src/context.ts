@@ -9,6 +9,7 @@ import type { SmsSender } from '@plunj/notifications'
 import type { PaymentProvider } from '@plunj/payments'
 import { createAuth } from './auth.js'
 import type { PlunjAuth } from './auth.js'
+import { normalizePhoneUS } from './phone.js'
 
 export interface StaffSession {
   user: StaffUser
@@ -64,9 +65,12 @@ export async function createContext(options: CreateContextOptions): Promise<Cont
     })
     if (!staffUser && options.authUserPhone) {
       // First staff sign-in: claim the unlinked StaffUser row for this
-      // OTP-verified phone (mirrors the customer guest-claim flow).
+      // OTP-verified phone (mirrors the customer guest-claim flow). StaffUser
+      // phones are stored canonically (E.164) — normalize the session phone
+      // before comparing, falling back to the raw value for legacy sessions.
+      const authPhone = normalizePhoneUS(options.authUserPhone) ?? options.authUserPhone
       const claimed = await options.db.staffUser.updateMany({
-        where: { phone: options.authUserPhone, active: true, authUserId: null },
+        where: { phone: authPhone, active: true, authUserId: null },
         data: { authUserId: options.authUserId },
       })
       if (claimed.count > 0) {

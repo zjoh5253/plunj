@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LocationDetail } from '@/lib/api-types'
 import { domainError } from '@/lib/api-types'
-import { formatDateKeyLong, formatTimeOfDay } from '@/lib/format'
+import { formatDateKeyLong, formatPhoneUS, formatTimeOfDay } from '@/lib/format'
 import { useTRPC } from '@/lib/trpc/client'
 
 export function RosterClient({ location }: { location: LocationDetail }) {
@@ -302,7 +302,7 @@ function GuestRow({
             href={`tel:${booking.customerPhone}`}
             className="text-sm text-gray-500 underline-offset-2 tabular-nums hover:underline"
           >
-            {booking.customerPhone}
+            {formatPhoneUS(booking.customerPhone)}
           </a>
           <WaiverBadge status={booking.waiverStatus} />
           <PaymentBadge status={booking.paymentStatus} />

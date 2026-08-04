@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LocationDetail } from '@/lib/api-types'
 import { domainError } from '@/lib/api-types'
-import { formatCents, formatSessionMoment } from '@/lib/format'
+import { formatCents, formatPhoneUS, formatSessionMoment } from '@/lib/format'
 import { useTRPC } from '@/lib/trpc/client'
 
 export function CustomersClient({ location }: { location: LocationDetail }) {
@@ -82,7 +82,9 @@ export function CustomersClient({ location }: { location: LocationDetail }) {
               >
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate font-medium">{hit.name || 'Guest'}</span>
-                  <span className="text-sm text-gray-500 tabular-nums">{hit.phone}</span>
+                  <span className="text-sm text-gray-500 tabular-nums">
+                    {formatPhoneUS(hit.phone)}
+                  </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
                   <span className="text-sm text-gray-500 tabular-nums">
@@ -135,7 +137,7 @@ function CustomerDetail({
           <Card className="flex flex-col gap-2 text-sm">
             <DetailRow label="Phone">
               <a href={`tel:${hit.phone}`} className="tabular-nums underline underline-offset-2">
-                {hit.phone}
+                {formatPhoneUS(hit.phone)}
               </a>
             </DetailRow>
             <DetailRow label="Customer type">

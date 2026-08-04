@@ -10,9 +10,11 @@ import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { Markdown } from '@/components/booking/markdown'
+import { ShareSheet } from '@/components/booking/share-sheet'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import type { ManageBooking, WaiverDoc } from '@/lib/api-types'
 import { domainError } from '@/lib/api-types'
 import { useTRPC } from '@/lib/trpc/client'
@@ -62,17 +64,28 @@ export function WaiverClient({
 
   if (signMutation.isSuccess) {
     return (
-      <div className="flex flex-col items-center gap-4 pt-16 text-center">
-        <p className="text-5xl text-ok" aria-hidden>
-          ✓
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight">Waiver signed</h1>
-        <p className="max-w-xs text-gray-500">
-          You&apos;re all set for {booking.whenLocal} at {booking.location.name}.
-        </p>
-        <Link href={`/manage/${token}`} className="text-sm font-medium underline">
-          View your booking
-        </Link>
+      <div className="flex flex-col gap-6 pt-16">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="text-5xl text-ok" aria-hidden>
+            ✓
+          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">Waiver signed</h1>
+          <p className="max-w-xs text-gray-500">
+            You&apos;re all set for {booking.whenLocal} at {booking.location.name}.
+          </p>
+          <Link href={`/manage/${token}`} className="text-sm font-medium underline">
+            View your booking
+          </Link>
+        </div>
+        {booking.seats > 1 ? (
+          <ShareSheet
+            heading="Anyone else coming?"
+            subtitle="Everyone in your group signs from this same link — pass it along."
+            title={`PLUNJ — ${booking.location.name}`}
+            text={`You're invited to PLUNJ — ${booking.whenLocal}. Sign the quick waiver before you arrive:`}
+            path={`/waiver/${token}`}
+          />
+        ) : null}
       </div>
     )
   }
@@ -81,7 +94,7 @@ export function WaiverClient({
   const canSign =
     !blocked &&
     name.trim().length > 0 &&
-    (isMinor ? guardianPhone : phone).trim().length >= 7 &&
+    (isMinor ? guardianPhone : phone).length === 10 &&
     agreed &&
     typedName.trim().length > 0 &&
     (!isMinor || (guardianName.trim().length > 0 && guardianRelationship.trim().length > 0)) &&
@@ -97,10 +110,10 @@ export function WaiverClient({
         signMutation.mutate({
           bookingManageToken: token,
           signer: isMinor
-            ? { name: guardianName.trim(), phone: guardianPhone.trim() }
+            ? { name: guardianName.trim(), phone: `+1${guardianPhone}` }
             : {
                 name: name.trim(),
-                phone: phone.trim(),
+                phone: `+1${phone}`,
                 ...(dob ? { dateOfBirth: dob } : {}),
               },
           signatureKind: 'TYPED',
@@ -142,15 +155,7 @@ export function WaiverClient({
         required
       />
       {!isMinor ? (
-        <Input
-          label="Mobile number"
-          type="tel"
-          autoComplete="tel"
-          inputMode="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-        />
+        <PhoneInput label="Mobile number" value={phone} onChange={setPhone} required />
       ) : null}
       <Input
         label="Date of birth"
@@ -171,12 +176,10 @@ export function WaiverClient({
             onChange={(e) => setGuardianName(e.target.value)}
             required
           />
-          <Input
+          <PhoneInput
             label="Guardian mobile number"
-            type="tel"
-            inputMode="tel"
             value={guardianPhone}
-            onChange={(e) => setGuardianPhone(e.target.value)}
+            onChange={setGuardianPhone}
             required
           />
           <Input

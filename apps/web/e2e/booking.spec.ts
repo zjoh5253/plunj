@@ -6,9 +6,9 @@
  *
  * Money strings are hand-computed literals pinned against the server output —
  * the tests NEVER recompute money:
- *   2 seats × $45.00 = $90.00 subtotal
- *   tax  = round(9000 × 725 / 10000) = round(652.5) = 653¢ → "$6.53"
- *   total = 9000 + 653 = 9653¢ → "$96.53"
+ *   2 seats × $35.00 = $70.00 subtotal
+ *   tax  = round(7000 × 725 / 10000) = round(507.5) = 508¢ → "$5.08"
+ *   total = 7000 + 508 = 7508¢ → "$75.08"
  */
 import { expect, test } from '@playwright/test'
 import { BOOK, dateTab, deliverPaymentWebhook, escapeRegex, moneyRowValue } from './helpers'
@@ -30,10 +30,10 @@ test('golden path: browse → checkout → fake-webhook payment → waiver → C
   await dateTab(page, 1).click()
   await expect(dateTab(page, 1)).toHaveAttribute('aria-selected', 'true')
 
-  // Pick the first bookable slot (every seeded slot renders the "$45.00" price).
+  // Pick the first bookable slot (every seeded Provo slot renders the "$35.00" price).
   const slot = page
     .getByRole('button')
-    .filter({ hasText: '$45.00' })
+    .filter({ hasText: '$35.00' })
     .and(page.locator(':not([disabled])'))
     .first()
   await slot.click()
@@ -41,13 +41,13 @@ test('golden path: browse → checkout → fake-webhook payment → waiver → C
 
   // --- Checkout breakdown: verbatim server strings -------------------------
   await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible()
-  // Line: 2 × Contrast Session, $90.00; then Subtotal / Tax / Total.
-  await expect(moneyRowValue(page, /^Contrast Session — .* × 2$/)).toHaveText('$90.00')
-  await expect(moneyRowValue(page, 'Subtotal')).toHaveText('$90.00')
-  await expect(moneyRowValue(page, 'Tax')).toHaveText('$6.53')
-  await expect(moneyRowValue(page, 'Total')).toHaveText('$96.53')
+  // Line: 2 × Contrast Session, $70.00; then Subtotal / Tax / Total.
+  await expect(moneyRowValue(page, /^Contrast Session — .* × 2$/)).toHaveText('$70.00')
+  await expect(moneyRowValue(page, 'Subtotal')).toHaveText('$70.00')
+  await expect(moneyRowValue(page, 'Tax')).toHaveText('$5.08')
+  await expect(moneyRowValue(page, 'Total')).toHaveText('$75.08')
   // Pay-button label equals the rendered total — one server value.
-  const payButton = page.getByRole('button', { name: 'Pay $96.53' })
+  const payButton = page.getByRole('button', { name: 'Pay $75.08' })
   await expect(payButton).toBeVisible()
 
   // --- Contact + start checkout --------------------------------------------
@@ -63,7 +63,9 @@ test('golden path: browse → checkout → fake-webhook payment → waiver → C
   expect(response.ok()).toBe(true)
   const raw = (await response.json()) as unknown
   const startData = (
-    Array.isArray(raw) ? (raw[0] as { result: { data: unknown } }).result.data : (raw as { result: { data: unknown } }).result.data
+    Array.isArray(raw)
+      ? (raw[0] as { result: { data: unknown } }).result.data
+      : (raw as { result: { data: unknown } }).result.data
   ) as {
     bookingId: string
     manageToken: string
@@ -74,7 +76,7 @@ test('golden path: browse → checkout → fake-webhook payment → waiver → C
 
   // --- Payment stage: same server total; Stripe.js is unavailable in E2E ---
   await expect(page.getByRole('heading', { name: 'Payment' })).toBeVisible()
-  await expect(moneyRowValue(page, 'Total')).toHaveText('$96.53')
+  await expect(moneyRowValue(page, 'Total')).toHaveText('$75.08')
   await expect(page.getByText(/Payments aren.t configured in this environment/)).toBeVisible()
 
   // Complete the payment by driving the webhook endpoint with the fake

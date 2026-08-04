@@ -23,6 +23,10 @@ export interface MomenceLocationSeed {
   email: string
   status: 'ACTIVE' | 'COMING_SOON'
   taxRateBps: number
+  /** Real Momence drop-in price/capacity (fetched via plunj.co's momence proxy, 2026-08-04). */
+  sessionPriceCents?: number
+  sessionCapacity?: number
+  momenceHostId?: number
   settings: Record<string, unknown>
 }
 
@@ -41,6 +45,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'slc-hosts@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 8,
+    momenceHostId: 131754,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -75,6 +82,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'parkcity@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 8,
+    momenceHostId: 54312,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -105,6 +115,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'draper@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 172884,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -135,6 +148,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'saratogasprings@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 78270,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -164,6 +180,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'stgeorge@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3499,
+    sessionCapacity: 8,
+    momenceHostId: 138779,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -193,6 +212,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'herriman@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 134238,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -222,6 +244,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'kaysville@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3000,
+    sessionCapacity: 7,
+    momenceHostId: 88105,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -255,6 +280,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'logan@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 725,
+    sessionPriceCents: 3500,
+    sessionCapacity: 8,
+    momenceHostId: 143987,
     settings: {
       source: SCRAPE_SOURCE,
       hours: null,
@@ -276,6 +304,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'loveland@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 670,
+    sessionPriceCents: 3800,
+    sessionCapacity: 7,
+    momenceHostId: 160979,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -309,6 +340,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'idahofalls@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 600,
+    sessionPriceCents: 3000,
+    sessionCapacity: 6,
+    momenceHostId: 53707,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -337,6 +371,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'boise@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 600,
+    sessionPriceCents: 3499,
+    sessionCapacity: 6,
+    momenceHostId: 53708,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -366,6 +403,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'knoxville@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 975,
+    sessionPriceCents: 3500,
+    sessionCapacity: 8,
+    momenceHostId: 85369,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -396,6 +436,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'paradisevalley@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 780,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 102689,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -425,6 +468,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'chandler@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 780,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 193575,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {
@@ -454,6 +500,9 @@ export const MOMENCE_LOCATIONS: MomenceLocationSeed[] = [
     email: 'mckinney@plunj.co',
     status: 'ACTIVE',
     taxRateBps: 825,
+    sessionPriceCents: 3500,
+    sessionCapacity: 7,
+    momenceHostId: 168994,
     settings: {
       source: SCRAPE_SOURCE,
       hours: {

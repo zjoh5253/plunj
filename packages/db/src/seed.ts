@@ -15,6 +15,9 @@ import { MOMENCE_LOCATIONS } from './seed-locations.js'
 
 const EFFECTIVE_FROM = new Date('2026-01-01T00:00:00.000Z')
 
+// Real Momence drop-in price for Provo (host 78731), fetched 2026-08-04.
+const PROVO_PRICE_CENTS = 3500
+
 function sha256(text: string): string {
   return createHash('sha256').update(text, 'utf8').digest('hex')
 }
@@ -124,10 +127,11 @@ async function main() {
         locationId: provo.id,
         name: 'Contrast Suite',
         kind: 'CONTRAST_SUITE',
-        defaultCapacity: 8,
+        defaultCapacity: 6, // real Momence capacity (host 78731)
         active: true,
       },
     }))
+  await prisma.studio.update({ where: { id: studio.id }, data: { defaultCapacity: 6 } })
 
   // --- Hourly session templates matching real hours --------------------------
   let templateCount = 0
@@ -151,11 +155,11 @@ async function main() {
           startTimeLocal,
           durationMin: 60,
           offeringType: 'COMMUNAL',
-          priceCents: 4500,
+          priceCents: PROVO_PRICE_CENTS,
           effectiveFrom: EFFECTIVE_FROM,
           active: true,
         },
-        update: { priceCents: 4500, offeringType: 'COMMUNAL', active: true },
+        update: { priceCents: PROVO_PRICE_CENTS, offeringType: 'COMMUNAL', active: true },
       })
       templateCount++
     }
@@ -268,7 +272,7 @@ async function main() {
   // and session templates are derived from the scraped hours; drop-in price
   // defaults to Provo's confirmed $45 — REAL PER-LOCATION PRICES ARE UNKNOWN
   // (not published on plunj.co) and must be corrected before any real cutover.
-  const DEFAULT_PRICE_CENTS = 4500
+  const DEFAULT_PRICE_CENTS = 3500
   for (const loc of MOMENCE_LOCATIONS) {
     const active = loc.status === 'ACTIVE'
     const data = {
@@ -305,10 +309,14 @@ async function main() {
           locationId: location.id,
           name: 'Contrast Suite',
           kind: 'CONTRAST_SUITE',
-          defaultCapacity: 8,
+          defaultCapacity: loc.sessionCapacity ?? 8,
           active: true,
         },
       }))
+    await prisma.studio.update({
+      where: { id: locStudio.id },
+      data: { defaultCapacity: loc.sessionCapacity ?? 8 },
+    })
 
     // Templates from scraped hours; locations with no published hours (Logan)
     // fall back to Provo-style hours so they're bookable in the demo.
@@ -335,11 +343,11 @@ async function main() {
             startTimeLocal,
             durationMin: 60,
             offeringType: 'COMMUNAL',
-            priceCents: DEFAULT_PRICE_CENTS,
+            priceCents: loc.sessionPriceCents ?? DEFAULT_PRICE_CENTS,
             effectiveFrom: EFFECTIVE_FROM,
             active: true,
           },
-          update: { active: true },
+          update: { active: true, priceCents: loc.sessionPriceCents ?? DEFAULT_PRICE_CENTS },
         })
       }
     }

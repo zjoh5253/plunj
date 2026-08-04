@@ -14,6 +14,7 @@ import { HoldCountdown } from '@/components/booking/hold-countdown'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import type {
   CheckoutItem,
   CheckoutStartResult,
@@ -151,7 +152,7 @@ export function CheckoutClient({
   }
 
   const canSubmit =
-    firstName.trim().length > 0 && phone.trim().length >= 7 && quote !== undefined && !requoting
+    firstName.trim().length > 0 && phone.length === 10 && quote !== undefined && !requoting
 
   return (
     <form
@@ -168,7 +169,7 @@ export function CheckoutClient({
           ...(tipCents !== undefined ? { tipCents } : {}),
           customer: {
             firstName: firstName.trim(),
-            phone: phone.trim(),
+            phone: `+1${phone}`,
             ...(trimmedLast ? { lastName: trimmedLast } : {}),
           },
         })
@@ -212,23 +213,19 @@ export function CheckoutClient({
           onChange={(e) => setLastName(e.target.value)}
         />
       </div>
-      <Input
+      <PhoneInput
         label="Mobile number"
-        type="tel"
-        autoComplete="tel"
-        inputMode="tel"
-        placeholder="(555) 555-5555"
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        onChange={setPhone}
         hint="We'll text your confirmation and waiver link here."
         required
       />
       {/* A2P 10DLC opt-in disclosure — carrier-required language; keep in sync
           with the Twilio campaign registration. */}
       <p className="text-xs leading-relaxed text-gray-500">
-        By booking, you agree to receive booking confirmations, waiver links, and session
-        reminders by text from PLUNJ. Message frequency varies. Message &amp; data rates may
-        apply. Reply STOP to cancel or HELP for help.{' '}
+        By booking, you agree to receive booking confirmations, waiver links, and session reminders
+        by text from PLUNJ. Message frequency varies. Message &amp; data rates may apply. Reply STOP
+        to cancel or HELP for help.{' '}
         <a
           href="https://plunj.co/privacy-policy"
           className="underline"

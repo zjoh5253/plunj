@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ShareSheet } from '@/components/booking/share-sheet'
 import { Card } from '@/components/ui/card'
 import { formatSessionMoment } from '@/lib/format'
 import { prisma } from '@/lib/trpc/server'
@@ -123,6 +124,18 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
           Add to calendar
         </a>
       </Card>
+
+      <ShareSheet
+        heading={booking.seats > 1 ? 'Invite your crew' : 'Bringing someone?'}
+        subtitle={
+          booking.seats > 1
+            ? `${booking.seats} spots are booked — send everyone the invite so they can sign their waiver before you arrive.`
+            : 'Share the session — guests sign their waiver from the same link.'
+        }
+        title={`PLUNJ — ${booking.location.name}`}
+        text={`You're invited to PLUNJ ${booking.location.city} — ${whenLocal}. Sign the quick waiver before you arrive:`}
+        path={`/waiver/${token}`}
+      />
 
       <Card className="flex flex-col gap-2">
         <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">What to bring</h2>

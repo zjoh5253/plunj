@@ -23,6 +23,7 @@ import { z } from 'zod'
 import { audit } from '../audit.js'
 import { WaiverUnsignedError } from '../errors.js'
 import { formatSessionMoment, iso, isoOrNull, localDateKey } from '../format.js'
+import { normalizePhoneUS } from '../phone.js'
 import { DiscountRejectedError, buildQuote } from '../pricing.js'
 import {
   currentWaiverDocument,
@@ -635,12 +636,26 @@ export const deskRouter = router({
         const location = await locationBySlug(db, input.locationSlug)
         ctx.assertLocationRole(location.id)
 
+        // Phones are stored canonically as "+1XXXXXXXXXX" — match phone-ish
+        // queries by their digits so "(801) 842", "801-842", and "801842" all
+        // hit the same rows. A full 10/11-digit entry normalizes to an exact
+        // E.164 match; partial digits fall back to contains. Name search is
+        // untouched.
+        const digits = input.q.replace(/\D/g, '')
+        const normalized = normalizePhoneUS(input.q)
+        const phoneClauses =
+          normalized !== null
+            ? [{ phone: normalized }]
+            : digits.length > 0
+              ? [{ phone: { contains: digits } }]
+              : []
+
         const customers = await db.customer.findMany({
           where: {
             AND: [
               {
                 OR: [
-                  { phone: { contains: input.q } },
+                  ...phoneClauses,
                   { firstName: { contains: input.q, mode: 'insensitive' } },
                   { lastName: { contains: input.q, mode: 'insensitive' } },
                 ],

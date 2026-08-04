@@ -29,6 +29,8 @@ export type { CreateAuthOptions, PlunjAuth } from './auth.js'
 export { audit } from './audit.js'
 export type { AuditInput } from './audit.js'
 
+export { formatPhoneUS, normalizePhoneUS } from './phone.js'
+
 export { WaiverUnsignedError } from './errors.js'
 export { hashStaffPin, verifyStaffPin } from './staff-pin.js'
 export type { DomainErrorCode, DomainErrorData } from './trpc.js'

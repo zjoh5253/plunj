@@ -8,6 +8,7 @@ import { enqueueBookingLifecycle } from '@plunj/notifications'
 import type { EnqueuedMessage, OutboxTx } from '@plunj/notifications'
 import { TRPCError } from '@trpc/server'
 import { formatSessionMoment, formatTimeOfDay } from './format.js'
+import { normalizePhoneUS } from './phone.js'
 
 export type DbClient = PrismaClient | Prisma.TransactionClient
 
@@ -62,18 +63,30 @@ export interface CustomerNameInput {
   phone: string
 }
 
+/** Normalize to canonical E.164 or reject — the shared guard for every phone entry point. */
+export function requireNormalizedPhone(input: string): string {
+  const phone = normalizePhoneUS(input)
+  if (phone === null) {
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Please enter a valid US mobile number' })
+  }
+  return phone
+}
+
 /**
  * Find-or-create the customer for a guest checkout / walk-in by phone.
- * An ACCOUNT row with that phone wins (the booking attaches to it — we never
- * silently merge a guest into an account, we just don't create a duplicate
- * shadow row). Otherwise an existing GUEST row is reused (name refreshed),
- * else a new GUEST shadow customer is created.
+ * The phone is normalized to E.164 BEFORE lookup/create so "8018422358" and
+ * "+18018422358" can never become two Customer rows. An ACCOUNT row with that
+ * phone wins (the booking attaches to it — we never silently merge a guest
+ * into an account, we just don't create a duplicate shadow row). Otherwise an
+ * existing GUEST row is reused (name refreshed), else a new GUEST shadow
+ * customer is created.
  */
 export async function upsertCustomerByPhone(
   db: DbClient,
   input: CustomerNameInput,
 ): Promise<Customer> {
-  const matches = await db.customer.findMany({ where: { phone: input.phone } })
+  const phone = requireNormalizedPhone(input.phone)
+  const matches = await db.customer.findMany({ where: { phone } })
   const existing =
     matches.find((c) => c.kind === CustomerKind.ACCOUNT) ??
     matches.find((c) => c.kind === CustomerKind.GUEST) ??
@@ -93,7 +106,7 @@ export async function upsertCustomerByPhone(
       kind: CustomerKind.GUEST,
       firstName: input.firstName,
       lastName: input.lastName ?? null,
-      phone: input.phone,
+      phone,
     },
   })
 }

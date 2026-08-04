@@ -17,9 +17,10 @@ import { DeskSheet } from '@/components/desk/sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { PhoneInput, phoneDigits } from '@/components/ui/phone-input'
 import type { LocationDetail } from '@/lib/api-types'
 import { domainError } from '@/lib/api-types'
-import { formatCents, formatTimeOfDay } from '@/lib/format'
+import { formatCents, formatPhoneUS, formatTimeOfDay } from '@/lib/format'
 import { useTRPC } from '@/lib/trpc/client'
 
 type Tender = 'CASH_RECORDED' | 'COMP' | 'TERMINAL'
@@ -114,7 +115,7 @@ export function WalkinSheet({
     const parts = hit.name.split(/\s+/).filter(Boolean)
     setFirstName(parts[0] ?? '')
     setLastName(parts.slice(1).join(' '))
-    setPhone(hit.phone)
+    setPhone(phoneDigits(hit.phone))
     setQuery('')
     setDebouncedQuery('')
   }
@@ -142,7 +143,7 @@ export function WalkinSheet({
   const canSubmit =
     selectedSessionId !== null &&
     firstName.trim().length > 0 &&
-    phone.trim().length >= 7 &&
+    phone.length === 10 &&
     tender !== null &&
     serverQuote !== undefined &&
     rejection === null &&
@@ -200,7 +201,7 @@ export function WalkinSheet({
             seats,
             customer: {
               firstName: firstName.trim(),
-              phone: phone.trim(),
+              phone: `+1${phone}`,
               ...(trimmedLast ? { lastName: trimmedLast } : {}),
             },
             ...(code !== '' ? { discountCode: code } : {}),
@@ -297,7 +298,9 @@ export function WalkinSheet({
                     >
                       <span className="flex min-w-0 flex-col">
                         <span className="truncate font-medium">{hit.name || 'Guest'}</span>
-                        <span className="text-sm text-gray-500 tabular-nums">{hit.phone}</span>
+                        <span className="text-sm text-gray-500 tabular-nums">
+                          {formatPhoneUS(hit.phone)}
+                        </span>
                       </span>
                       {hit.waiverStatus === 'SIGNED' ? (
                         <Badge tone="ok">✓ Waiver</Badge>
@@ -325,14 +328,11 @@ export function WalkinSheet({
               onChange={(e) => setLastName(e.target.value)}
             />
           </div>
-          <Input
+          <PhoneInput
             label="Mobile number"
-            type="tel"
-            inputMode="tel"
             autoComplete="off"
-            placeholder="(555) 555-5555"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={setPhone}
             required
           />
         </div>

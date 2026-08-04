@@ -15,6 +15,7 @@ import type { SmsSender } from '@plunj/notifications'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { phoneNumber } from 'better-auth/plugins/phone-number'
+import { normalizePhoneUS } from './phone.js'
 
 export const requiredAuthModels = [
   'authUser',
@@ -42,6 +43,11 @@ export function createAuth(options: CreateAuthOptions) {
     verification: { modelName: 'authVerification' },
     plugins: [
       phoneNumber({
+        // The plugin has no normalization hook — it stores the phone it is
+        // given verbatim. Callers (tRPC otp.*, the web clients) normalize to
+        // E.164 first; this validator rejects anything non-canonical so
+        // auth_users.phone_number can never split customer identity.
+        phoneNumberValidator: (phone) => normalizePhoneUS(phone) === phone,
         sendOTP: async ({ phoneNumber: to, code }) => {
           await options.sms.sendSms(to, renderSms('otp-code', { code }))
         },

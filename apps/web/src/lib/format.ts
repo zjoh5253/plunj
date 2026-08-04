@@ -86,6 +86,18 @@ export function upcomingDateKeys(
   return [...new Set(keys)]
 }
 
+/**
+ * E.164 "+18018422358" → "(801) 842-2358" for display. Non-canonical input is
+ * returned unchanged. Mirrors @plunj/api's formatPhoneUS (local copy — pulling
+ * the API package's runtime into client bundles would drag server deps along).
+ * Keep tel: links on the raw E.164 value; only the visible text is formatted.
+ */
+export function formatPhoneUS(e164: string): string {
+  const match = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(e164)
+  if (!match) return e164
+  return `(${match[1]}) ${match[2]}-${match[3]}`
+}
+
 /** Milliseconds → "9:58" countdown text (never negative). */
 export function formatCountdown(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000))
