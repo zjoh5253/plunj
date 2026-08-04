@@ -5,11 +5,13 @@
  */
 import { createHash } from 'node:crypto'
 import { id, prisma } from './index.js'
+import type { Prisma } from './index.js'
 import {
   LIABILITY_WAIVER_MARKDOWN,
   MINOR_CONSENT_MARKDOWN,
   PRIVACY_POLICY_MARKDOWN,
 } from './waiver-content.js'
+import { MOMENCE_LOCATIONS } from './seed-locations.js'
 
 const EFFECTIVE_FROM = new Date('2026-01-01T00:00:00.000Z')
 
@@ -217,11 +219,39 @@ async function main() {
     })
   }
 
+  // --- The rest of the network (Momence-routed until each cutover) ------------
+  for (const loc of MOMENCE_LOCATIONS) {
+    const data = {
+      orgId: org.id,
+      name: loc.name,
+      timezone: loc.timezone,
+      address1: loc.address1,
+      address2: loc.address2 ?? null,
+      city: loc.city,
+      state: loc.state,
+      postalCode: loc.postalCode,
+      phone: loc.phone,
+      email: loc.email,
+      status: loc.status,
+      taxRateBps: loc.taxRateBps,
+      bookingProvider: 'MOMENCE',
+      // No public Momence booking URL exists (the widget is client-rendered),
+      // so route to the location page's booking anchor — today's real flow.
+      momenceUrl: `https://plunj.co/locations/${loc.slug}#booking`,
+      settings: loc.settings as Prisma.InputJsonObject,
+    } as const
+    await prisma.location.upsert({
+      where: { slug: loc.slug },
+      create: { id: id(), slug: loc.slug, ...data },
+      update: data,
+    })
+  }
+
   console.log(
     `Seeded: org ${org.name}, location ${provo.slug}, studio ${studio.name}, ` +
       `${templateCount} session templates, ${buyouts.length} buyout options, ` +
       `${waivers.length} waiver documents, ${discountCodes.length} discount codes, ` +
-      `${staff.length} staff users`,
+      `${staff.length} staff users, ${MOMENCE_LOCATIONS.length} Momence-routed locations`,
   )
 }
 
