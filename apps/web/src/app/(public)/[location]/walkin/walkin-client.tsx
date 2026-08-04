@@ -81,6 +81,21 @@ export function WalkinClient({ location, doc }: { location: LocationDetail; doc:
         onChange={(e) => setPhone(e.target.value)}
         required
       />
+      {/* A2P 10DLC opt-in disclosure — carrier-required language; keep in sync
+          with the Twilio campaign registration. */}
+      <p className="text-xs leading-relaxed text-gray-500">
+        By continuing, you agree to receive booking-related texts from PLUNJ (confirmations,
+        waiver links, reminders). Message frequency varies. Message &amp; data rates may apply.
+        Reply STOP to cancel or HELP for help.{' '}
+        <a
+          href="https://plunj.co/privacy-policy"
+          className="underline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Privacy policy
+        </a>
+      </p>
 
       {doc ? (
         <>

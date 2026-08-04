@@ -223,6 +223,21 @@ export function CheckoutClient({
         hint="We'll text your confirmation and waiver link here."
         required
       />
+      {/* A2P 10DLC opt-in disclosure — carrier-required language; keep in sync
+          with the Twilio campaign registration. */}
+      <p className="text-xs leading-relaxed text-gray-500">
+        By booking, you agree to receive booking confirmations, waiver links, and session
+        reminders by text from PLUNJ. Message frequency varies. Message &amp; data rates may
+        apply. Reply STOP to cancel or HELP for help.{' '}
+        <a
+          href="https://plunj.co/privacy-policy"
+          className="underline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Privacy policy
+        </a>
+      </p>
 
       {/* Always-visible promo field */}
       <Input
