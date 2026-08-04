@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/book/api/cron",
-      "schedule": "* * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }
