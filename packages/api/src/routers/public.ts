@@ -110,6 +110,7 @@ export const publicRouter = router({
         timezone: l.timezone,
         city: l.city,
         state: l.state,
+        postalCode: l.postalCode,
         phone: l.phone,
         bookingProvider: l.bookingProvider,
         momenceUrl: l.momenceUrl,

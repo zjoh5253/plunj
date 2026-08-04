@@ -495,6 +495,110 @@ export const adminRouter = router({
       }),
   }),
 
+  buyouts: router({
+    // Unlike public.buyouts.options this includes inactive tiers.
+    list: adminProcedure
+      .input(z.object({ locationSlug: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const location = await locationBySlug(ctx.db, input.locationSlug)
+        ctx.assertLocationRole(location.id)
+        const options = await ctx.db.buyoutOption.findMany({
+          where: { locationId: location.id },
+          orderBy: [{ active: 'desc' }, { durationHours: 'asc' }],
+        })
+        return options.map((o) => ({
+          buyoutOptionId: o.id,
+          durationHours: o.durationHours,
+          priceCents: o.priceCents,
+          maxGuests: o.maxGuests,
+          active: o.active,
+        }))
+      }),
+
+    create: adminProcedure
+      .input(
+        z.object({
+          locationSlug: z.string(),
+          durationHours: z.number().int().min(1).max(12),
+          priceCents: z.number().int().min(0),
+          maxGuests: z.number().int().min(1).max(50),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { db } = ctx
+        const location = await locationBySlug(db, input.locationSlug)
+        ctx.assertLocationRole(location.id)
+        const optionId = id()
+        await db.$transaction(async (tx) => {
+          await tx.buyoutOption.create({
+            data: {
+              id: optionId,
+              locationId: location.id,
+              durationHours: input.durationHours,
+              priceCents: input.priceCents,
+              maxGuests: input.maxGuests,
+              active: true,
+            },
+          })
+          await audit(tx, {
+            actorType: 'STAFF',
+            actorId: ctx.staff.user.id,
+            locationId: location.id,
+            action: 'admin.buyout_create',
+            entityType: 'BuyoutOption',
+            entityId: optionId,
+            after: {
+              durationHours: input.durationHours,
+              priceCents: input.priceCents,
+              maxGuests: input.maxGuests,
+            },
+          })
+        })
+        return { buyoutOptionId: optionId }
+      }),
+
+    update: adminProcedure
+      .input(
+        z.object({
+          buyoutOptionId: z.string(),
+          priceCents: z.number().int().min(0).optional(),
+          maxGuests: z.number().int().min(1).max(50).optional(),
+          active: z.boolean().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { db } = ctx
+        const option = await db.buyoutOption.findUnique({ where: { id: input.buyoutOptionId } })
+        if (!option) throw new TRPCError({ code: 'NOT_FOUND', message: 'Buyout option not found' })
+        ctx.assertLocationRole(option.locationId)
+        await db.$transaction(async (tx) => {
+          await tx.buyoutOption.update({
+            where: { id: option.id },
+            data: {
+              ...(input.priceCents !== undefined ? { priceCents: input.priceCents } : {}),
+              ...(input.maxGuests !== undefined ? { maxGuests: input.maxGuests } : {}),
+              ...(input.active !== undefined ? { active: input.active } : {}),
+            },
+          })
+          await audit(tx, {
+            actorType: 'STAFF',
+            actorId: ctx.staff.user.id,
+            locationId: option.locationId,
+            action: 'admin.buyout_update',
+            entityType: 'BuyoutOption',
+            entityId: option.id,
+            before: {
+              priceCents: option.priceCents,
+              maxGuests: option.maxGuests,
+              active: option.active,
+            },
+            after: input,
+          })
+        })
+        return { updated: true }
+      }),
+  }),
+
   team: router({
     list: adminProcedure
       .input(z.object({ locationSlug: z.string() }))

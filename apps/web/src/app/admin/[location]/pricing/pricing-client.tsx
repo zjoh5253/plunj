@@ -17,6 +17,7 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
+import { BuyoutEditor } from './buyout-editor'
 import { Select } from '@/components/admin/fields'
 import { QuoteBreakdown } from '@/components/admin/quote-breakdown'
 import { useStaffGuard } from '@/components/admin/staff'
@@ -305,10 +306,6 @@ export function PricingClient({ location }: { location: LocationDetail }) {
     updateMutation.mutate({ discountCodeId: row.id, active: !row.active })
   }
 
-  const buyouts = useQuery(
-    trpc.public.buyouts.options.queryOptions({ locationSlug: location.slug }),
-  )
-
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -554,30 +551,7 @@ export function PricingClient({ location }: { location: LocationDetail }) {
             </div>
           </Card>
 
-          <Card className="flex flex-col gap-2">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
-              Buyout pricing
-            </h2>
-            {buyouts.isPending ? (
-              <Skeleton className="h-8" />
-            ) : (buyouts.data ?? []).length === 0 ? (
-              <p className="text-sm text-gray-500">No buyout options configured.</p>
-            ) : (
-              <ul className="flex flex-col gap-1 text-sm">
-                {(buyouts.data ?? []).map((o) => (
-                  <li key={o.id} className="flex justify-between">
-                    <span>
-                      {o.durationHours}h private buyout · up to {o.maxGuests} guests
-                    </span>
-                    <span className="tabular-nums">{formatCents(o.priceCents)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="text-xs text-gray-500">
-              Read-only — the admin API doesn&apos;t expose buyout pricing edits yet.
-            </p>
-          </Card>
+          <BuyoutEditor location={location} />
         </div>
 
         {/* ------------------------------ Right: live preview */}
