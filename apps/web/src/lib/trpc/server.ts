@@ -11,6 +11,7 @@ import { createAuth, createCaller, createContext } from '@plunj/api'
 import type { PlunjAuth } from '@plunj/api'
 import { prisma } from '@plunj/db'
 import {
+  EmailBridgeSmsSender,
   FakeEmailSender,
   FakeSmsSender,
   ResendEmailSender,
@@ -42,15 +43,27 @@ export function getPayments(): PaymentProvider {
 }
 
 export function getSms(): SmsSender {
-  return (cache.sms ??=
-    process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-      ? new TwilioSmsSender()
-      : new FakeSmsSender())
+  if (!cache.sms) {
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+      cache.sms = new TwilioSmsSender()
+    } else if (process.env.RESEND_API_KEY && process.env.SMS_FALLBACK_EMAIL) {
+      // Pilot bridge while the SMS number pends carrier registration: every
+      // outbound SMS (OTPs, confirmations) is emailed to one inbox instead.
+      cache.sms = new EmailBridgeSmsSender(getEmail(), process.env.SMS_FALLBACK_EMAIL)
+    } else {
+      cache.sms = new FakeSmsSender()
+    }
+  }
+  return cache.sms
 }
 
 export function getEmail(): EmailSender {
   return (cache.email ??= process.env.RESEND_API_KEY
-    ? new ResendEmailSender()
+    ? new ResendEmailSender(
+        // Until the plunj.co domain is verified in Resend, send from Resend's
+        // onboarding address (deliverable only to the account owner's inbox).
+        process.env.RESEND_FROM ? { from: process.env.RESEND_FROM } : {},
+      )
     : new FakeEmailSender())
 }
 

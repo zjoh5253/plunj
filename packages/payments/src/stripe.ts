@@ -112,6 +112,10 @@ const refFromExpandable = (
  * Stripe Connect implementation. Every charge-creating call is a DIRECT CHARGE on the
  * location's connected account (`stripeAccount` request option) so funds settle to the
  * location, and every mutating call carries the caller's idempotency key.
+ *
+ * Exception: an `internal:` account ref (a location with no connected account yet,
+ * e.g. during the pilot before Connect onboarding) charges the platform account
+ * directly — no `stripeAccount` option is sent.
  */
 export class StripeProvider implements PaymentProvider {
   private readonly stripe: Stripe
@@ -120,6 +124,10 @@ export class StripeProvider implements PaymentProvider {
   constructor(options: { secretKey: string; webhookSecret: string }) {
     this.stripe = new Stripe(options.secretKey)
     this.webhookSecret = options.webhookSecret
+  }
+
+  private accountOpts(ref: string): { stripeAccount?: string } {
+    return ref.startsWith('internal:') ? {} : { stripeAccount: ref }
   }
 
   async createPaymentIntent(args: CreatePaymentIntentArgs): Promise<PaymentIntentResult> {
@@ -134,7 +142,7 @@ export class StripeProvider implements PaymentProvider {
           ...(args.customerRef !== undefined ? { customer: args.customerRef } : {}),
           ...(args.paymentMethodRef !== undefined ? { payment_method: args.paymentMethodRef } : {}),
         },
-        { stripeAccount: args.locationAccountRef, idempotencyKey: args.idempotencyKey },
+        { ...this.accountOpts(args.locationAccountRef), idempotencyKey: args.idempotencyKey },
       )
       return toResult(pi)
     } catch (err) {
@@ -145,7 +153,7 @@ export class StripeProvider implements PaymentProvider {
   async confirmOffSession(args: ConfirmOffSessionArgs): Promise<PaymentIntentResult> {
     try {
       const requestOptions = {
-        stripeAccount: args.locationAccountRef,
+        ...this.accountOpts(args.locationAccountRef),
         idempotencyKey: args.idempotencyKey,
       }
       const pi =
@@ -185,7 +193,7 @@ export class StripeProvider implements PaymentProvider {
               ? { metadata: { reason: args.reason } }
               : {}),
         },
-        { stripeAccount: args.locationAccountRef, idempotencyKey: args.idempotencyKey },
+        { ...this.accountOpts(args.locationAccountRef), idempotencyKey: args.idempotencyKey },
       )
       return { providerRefundRef: refund.id, status: mapRefundStatus(refund.status) }
     } catch (err) {
@@ -198,7 +206,7 @@ export class StripeProvider implements PaymentProvider {
       await this.stripe.paymentIntents.cancel(
         args.providerPaymentRef,
         {},
-        { stripeAccount: args.locationAccountRef },
+        { ...this.accountOpts(args.locationAccountRef) },
       )
     } catch (err) {
       throw mapStripeError(err)
@@ -210,7 +218,7 @@ export class StripeProvider implements PaymentProvider {
       const pi = await this.stripe.paymentIntents.retrieve(
         args.providerPaymentRef,
         {},
-        { stripeAccount: args.locationAccountRef },
+        { ...this.accountOpts(args.locationAccountRef) },
       )
       return {
         providerPaymentRef: pi.id,

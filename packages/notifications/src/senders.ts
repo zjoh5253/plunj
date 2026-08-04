@@ -121,3 +121,26 @@ export class FakeEmailSender implements EmailSender {
     this.sent.push({ to, ...content })
   }
 }
+
+/**
+ * Dev/pilot bridge while an SMS number is pending carrier registration:
+ * delivers every outbound SMS body to a fixed email inbox instead. The
+ * phone-first UX stays intact; only the transport differs. Never use in
+ * production once real SMS works — the inbox sees every customer's messages.
+ */
+export class EmailBridgeSmsSender implements SmsSender {
+  constructor(
+    private readonly email: EmailSender,
+    private readonly inbox: string,
+  ) {}
+
+  async sendSms(to: string, body: string): Promise<void> {
+    await this.email.sendEmail(this.inbox, {
+      subject: `[SMS bridge] to ${to}`,
+      text: body,
+      html: `<p style="font-family:monospace;white-space:pre-wrap">${body
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')}</p><p style="color:#6f6f6f">Would have been texted to ${to}</p>`,
+    })
+  }
+}

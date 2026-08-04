@@ -33,6 +33,7 @@ export {
 export {
   TwilioSmsSender,
   ResendEmailSender,
+  EmailBridgeSmsSender,
   FakeSmsSender,
   FakeEmailSender,
   PLUNJ_EMAIL_FROM,
