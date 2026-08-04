@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { SlotListSkeleton } from '@/components/booking/slot-picker'
+import { HomeToggle } from '@/components/home/home-toggle'
 import { localDateKey, upcomingDateKeys } from '@/lib/format'
 import { getCaller } from '@/lib/trpc/server'
 import { ScheduleClient } from './schedule-client'
@@ -55,8 +56,11 @@ async function ScheduleData({ slug }: { slug: string }) {
 export default async function SchedulePage({ params }: Props) {
   const { location: slug } = await params
   return (
-    <Suspense fallback={<SlotListSkeleton />}>
-      <ScheduleData slug={slug} />
-    </Suspense>
+    <>
+      <HomeToggle slug={slug} />
+      <Suspense fallback={<SlotListSkeleton />}>
+        <ScheduleData slug={slug} />
+      </Suspense>
+    </>
   )
 }

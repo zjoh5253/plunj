@@ -402,6 +402,9 @@ model Customer {
   dateOfBirth      DateTime?    @map("date_of_birth") @db.Date
   authUserId       String?      @unique @map("auth_user_id")
   stripeCustomerId String?      @map("stripe_customer_id")
+  /// Preferred "home" studio — plain scalar by design (no FK), synced from the
+  /// client's localStorage choice when a customer session exists.
+  homeLocationId      String?       @map("home_location_id")
   createdAt        DateTime     @default(now()) @map("created_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
 

@@ -64,6 +64,73 @@ async function seedWaiverDocs(locationId: string): Promise<void> {
 }
 
 /**
+ * Standard network membership lineup. Prices are Provo's REAL Momence prices
+ * (fetched 2026-08-04) applied network-wide as provisional demo data — confirm
+ * per location at cutover.
+ */
+const MEMBERSHIP_PLANS = [
+  {
+    name: 'LAGOM Pass',
+    priceCents: 9653,
+    visitPolicy: 'N_PER_PERIOD',
+    visitsPerPeriod: 8,
+    guestPassesPerPeriod: 0,
+  },
+  {
+    name: 'SISU Unlimited',
+    priceCents: 13000,
+    visitPolicy: 'UNLIMITED',
+    visitsPerPeriod: null,
+    guestPassesPerPeriod: 0,
+  },
+  {
+    name: 'Sisu 2.0',
+    priceCents: 17696,
+    visitPolicy: 'UNLIMITED',
+    visitsPerPeriod: null,
+    guestPassesPerPeriod: 2,
+  },
+] as const
+
+const PUNCH_PASS = { name: '10 Visit Punch Pass', credits: 10, priceCents: 26813 } as const
+
+async function seedMembershipListings(locationId: string): Promise<void> {
+  for (const plan of MEMBERSHIP_PLANS) {
+    // MembershipPlan has no natural unique key — find-or-create by (locationId, name).
+    const existing = await prisma.membershipPlan.findFirst({
+      where: { locationId, name: plan.name },
+    })
+    const data = {
+      priceCents: plan.priceCents,
+      interval: 'MONTH',
+      visitPolicy: plan.visitPolicy,
+      visitsPerPeriod: plan.visitsPerPeriod,
+      guestPassesPerPeriod: plan.guestPassesPerPeriod,
+      giftable: true,
+      active: true,
+    } as const
+    if (existing) {
+      await prisma.membershipPlan.update({ where: { id: existing.id }, data })
+    } else {
+      await prisma.membershipPlan.create({
+        data: { id: id(), locationId, name: plan.name, ...data },
+      })
+    }
+  }
+
+  // Pack also has no natural unique key — same find-or-create by (locationId, name).
+  const existingPack = await prisma.pack.findFirst({
+    where: { locationId, name: PUNCH_PASS.name },
+  })
+  const packData = { credits: PUNCH_PASS.credits, priceCents: PUNCH_PASS.priceCents, active: true }
+  if (existingPack) {
+    await prisma.pack.update({ where: { id: existingPack.id }, data: packData })
+  } else {
+    await prisma.pack.create({ data: { id: id(), locationId, name: PUNCH_PASS.name, ...packData } })
+  }
+}
+
+/**
  * "06:00-22:30" or "06:00-11:30,16:30-20:30" → hourly session start times
  * ("HH:MM") for 60-minute sessions: from each range's open, every 60 minutes,
  * while the session still ends by close. Handles half-hour boundaries.
@@ -191,25 +258,8 @@ async function main() {
   // publishes its own copy of the corporate documents.
   await seedWaiverDocs(provo.id)
 
-  // --- Discount codes for testing --------------------------------------------
-  const discountCodes = [
-    { code: 'WELCOME20', type: 'PERCENT', valueBps: 2000 },
-    { code: 'FIRSTTIMER', type: 'PERCENT', valueBps: 5000 },
-    { code: 'TENOFF', type: 'FIXED_CENTS', valueCents: 1000 },
-  ] as const
-  for (const discount of discountCodes) {
-    await prisma.discountCode.upsert({
-      where: { locationId_code: { locationId: provo.id, code: discount.code } },
-      create: {
-        id: id(),
-        locationId: provo.id,
-        appliesTo: 'ALL',
-        active: true,
-        ...discount,
-      },
-      update: { active: true },
-    })
-  }
+  // --- Membership plans + punch pass (real Provo Momence prices) --------------
+  await seedMembershipListings(provo.id)
 
   // --- Staff users & roles ----------------------------------------------------
   // Placeholder phones: staff sign in via phone OTP, and the first verification
@@ -358,8 +408,11 @@ async function main() {
       priceUsd?: number
       maxGuests?: number
     }>
-    for (const tier of scrapedBuyouts) {
-      if (typeof tier.hours !== 'number' || typeof tier.priceUsd !== 'number') continue
+    const numericTiers = scrapedBuyouts.filter(
+      (tier): tier is { hours: number; priceUsd: number; maxGuests?: number } =>
+        typeof tier.hours === 'number' && typeof tier.priceUsd === 'number',
+    )
+    for (const tier of numericTiers) {
       const existing = await prisma.buyoutOption.findFirst({
         where: { locationId: location.id, durationHours: tier.hours },
       })
@@ -382,13 +435,63 @@ async function main() {
       }
     }
 
+    // Locations with no scraped buyout tiers get a provisional 1-hour default,
+    // estimated from the network ratio (Provo's real pricing: $210 = 6 × the
+    // $35 drop-in), with room for a couple of guests beyond communal capacity.
+    // Owner-editable in admin — confirm real buyout pricing at cutover.
+    if (numericTiers.length === 0) {
+      const defaultTier = {
+        priceCents: 6 * (loc.sessionPriceCents ?? DEFAULT_PRICE_CENTS),
+        maxGuests: (loc.sessionCapacity ?? 8) + 2,
+        active: true,
+      }
+      const existing = await prisma.buyoutOption.findFirst({
+        where: { locationId: location.id, durationHours: 1 },
+      })
+      if (existing) {
+        await prisma.buyoutOption.update({ where: { id: existing.id }, data: defaultTier })
+      } else {
+        await prisma.buyoutOption.create({
+          data: { id: id(), locationId: location.id, durationHours: 1, ...defaultTier },
+        })
+      }
+    }
+
     await seedWaiverDocs(location.id)
+    await seedMembershipListings(location.id)
+  }
+
+  // --- Discount codes for testing (every internal location) -------------------
+  const discountCodes = [
+    { code: 'WELCOME20', type: 'PERCENT', valueBps: 2000 },
+    { code: 'FIRSTTIMER', type: 'PERCENT', valueBps: 5000 },
+    { code: 'TENOFF', type: 'FIXED_CENTS', valueCents: 1000 },
+  ] as const
+  const internalLocations = await prisma.location.findMany({
+    where: { status: 'ACTIVE', bookingProvider: 'INTERNAL' },
+    select: { id: true },
+  })
+  for (const { id: locationId } of internalLocations) {
+    for (const discount of discountCodes) {
+      await prisma.discountCode.upsert({
+        where: { locationId_code: { locationId, code: discount.code } },
+        create: {
+          id: id(),
+          locationId,
+          appliesTo: 'ALL',
+          active: true,
+          ...discount,
+        },
+        update: { active: true },
+      })
+    }
   }
 
   console.log(
     `Seeded: org ${org.name}, location ${provo.slug}, studio ${studio.name}, ` +
       `${templateCount} session templates, ${buyouts.length} buyout options, ` +
       `${WAIVER_DOCS.length} waiver documents per internal location, ` +
+      `${MEMBERSHIP_PLANS.length} membership plans + 1 pack per internal location, ` +
       `${discountCodes.length} discount codes, ${staff.length} staff users, ` +
       `${MOMENCE_LOCATIONS.length} network locations`,
   )

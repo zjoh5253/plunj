@@ -217,6 +217,7 @@ export const CustomerScalarFieldEnum = {
   dateOfBirth: 'dateOfBirth',
   authUserId: 'authUserId',
   stripeCustomerId: 'stripeCustomerId',
+  homeLocationId: 'homeLocationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ShareSheet } from '@/components/booking/share-sheet'
+import { RememberHomeLocation } from '@/components/home/remember-home-location'
 import { Card } from '@/components/ui/card'
 import { formatSessionMoment } from '@/lib/format'
 import { prisma } from '@/lib/trpc/server'
@@ -87,6 +88,8 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
 
   return (
     <div className="flex flex-col gap-6 pt-4">
+      {/* First booking sets the home studio, only if none is set yet. */}
+      <RememberHomeLocation slug={booking.location.slug} />
       <div className="flex flex-col gap-2">
         <p className="text-4xl" aria-hidden>
           ✓

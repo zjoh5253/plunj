@@ -835,4 +835,75 @@ export const publicRouter = router({
         }
       }),
   }),
+
+  memberships: router({
+    /** Active plans + packs for a location (listing only — purchase is Phase 3). */
+    list: publicProcedure
+      .input(z.object({ locationSlug: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const location = await activeLocationBySlug(ctx.db, input.locationSlug)
+        const [plans, packs] = await Promise.all([
+          ctx.db.membershipPlan.findMany({
+            where: { locationId: location.id, active: true },
+            orderBy: { priceCents: 'asc' },
+          }),
+          ctx.db.pack.findMany({
+            where: { locationId: location.id, active: true },
+            orderBy: { priceCents: 'asc' },
+          }),
+        ])
+        return {
+          plans: plans.map((p) => ({
+            id: p.id,
+            name: p.name,
+            priceCents: p.priceCents,
+            interval: p.interval,
+            visitPolicy: p.visitPolicy,
+            visitsPerPeriod: p.visitsPerPeriod,
+            guestPassesPerPeriod: p.guestPassesPerPeriod,
+          })),
+          packs: packs.map((p) => ({
+            id: p.id,
+            name: p.name,
+            credits: p.credits,
+            priceCents: p.priceCents,
+            expiresAfterDays: p.expiresAfterDays,
+          })),
+        }
+      }),
+  }),
+
+  me: router({
+    /** Signed-in customer profile (null when no customer session). */
+    get: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.customer) return null
+      const home = ctx.customer.homeLocationId
+        ? await ctx.db.location.findUnique({ where: { id: ctx.customer.homeLocationId } })
+        : null
+      return {
+        customerId: ctx.customer.id,
+        firstName: ctx.customer.firstName,
+        homeLocationSlug: home?.slug ?? null,
+      }
+    }),
+
+    /** Persist the "home studio" choice on the signed-in customer. */
+    setHomeLocation: publicProcedure
+      .input(z.object({ locationSlug: z.string().nullable() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.customer) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Sign in to save your studio' })
+        }
+        let homeLocationId: string | null = null
+        if (input.locationSlug !== null) {
+          const location = await activeLocationBySlug(ctx.db, input.locationSlug)
+          homeLocationId = location.id
+        }
+        await ctx.db.customer.update({
+          where: { id: ctx.customer.id },
+          data: { homeLocationId },
+        })
+        return { homeLocationSlug: input.locationSlug }
+      }),
+  }),
 })

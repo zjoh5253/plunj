@@ -34,6 +34,7 @@ export type CustomerMinAggregateOutputType = {
   dateOfBirth: Date | null
   authUserId: string | null
   stripeCustomerId: string | null
+  homeLocationId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +49,7 @@ export type CustomerMaxAggregateOutputType = {
   dateOfBirth: Date | null
   authUserId: string | null
   stripeCustomerId: string | null
+  homeLocationId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +64,7 @@ export type CustomerCountAggregateOutputType = {
   dateOfBirth: number
   authUserId: number
   stripeCustomerId: number
+  homeLocationId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +81,7 @@ export type CustomerMinAggregateInputType = {
   dateOfBirth?: true
   authUserId?: true
   stripeCustomerId?: true
+  homeLocationId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +96,7 @@ export type CustomerMaxAggregateInputType = {
   dateOfBirth?: true
   authUserId?: true
   stripeCustomerId?: true
+  homeLocationId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +111,7 @@ export type CustomerCountAggregateInputType = {
   dateOfBirth?: true
   authUserId?: true
   stripeCustomerId?: true
+  homeLocationId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +199,7 @@ export type CustomerGroupByOutputType = {
   dateOfBirth: Date | null
   authUserId: string | null
   stripeCustomerId: string | null
+  homeLocationId: string | null
   createdAt: Date
   updatedAt: Date
   _count: CustomerCountAggregateOutputType | null
@@ -228,6 +235,7 @@ export type CustomerWhereInput = {
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Customer"> | Date | string | null
   authUserId?: Prisma.StringNullableFilter<"Customer"> | string | null
   stripeCustomerId?: Prisma.StringNullableFilter<"Customer"> | string | null
+  homeLocationId?: Prisma.StringNullableFilter<"Customer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Customer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Customer"> | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileListRelationFilter
@@ -253,6 +261,7 @@ export type CustomerOrderByWithRelationInput = {
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   authUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeLocationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   locationProfiles?: Prisma.CustomerLocationProfileOrderByRelationAggregateInput
@@ -281,6 +290,7 @@ export type CustomerWhereUniqueInput = Prisma.AtLeast<{
   email?: Prisma.StringNullableFilter<"Customer"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Customer"> | Date | string | null
   stripeCustomerId?: Prisma.StringNullableFilter<"Customer"> | string | null
+  homeLocationId?: Prisma.StringNullableFilter<"Customer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Customer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Customer"> | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileListRelationFilter
@@ -306,6 +316,7 @@ export type CustomerOrderByWithAggregationInput = {
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   authUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  homeLocationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CustomerCountOrderByAggregateInput
@@ -326,6 +337,7 @@ export type CustomerScalarWhereWithAggregatesInput = {
   dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"Customer"> | Date | string | null
   authUserId?: Prisma.StringNullableWithAggregatesFilter<"Customer"> | string | null
   stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Customer"> | string | null
+  homeLocationId?: Prisma.StringNullableWithAggregatesFilter<"Customer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Customer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Customer"> | Date | string
 }
@@ -340,6 +352,7 @@ export type CustomerCreateInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -365,6 +378,7 @@ export type CustomerUncheckedCreateInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -390,6 +404,7 @@ export type CustomerUpdateInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -415,6 +430,7 @@ export type CustomerUncheckedUpdateInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -440,6 +456,7 @@ export type CustomerCreateManyInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -454,6 +471,7 @@ export type CustomerUpdateManyMutationInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -468,6 +486,7 @@ export type CustomerUncheckedUpdateManyInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -482,6 +501,7 @@ export type CustomerCountOrderByAggregateInput = {
   dateOfBirth?: Prisma.SortOrder
   authUserId?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
+  homeLocationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -496,6 +516,7 @@ export type CustomerMaxOrderByAggregateInput = {
   dateOfBirth?: Prisma.SortOrder
   authUserId?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
+  homeLocationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -510,6 +531,7 @@ export type CustomerMinOrderByAggregateInput = {
   dateOfBirth?: Prisma.SortOrder
   authUserId?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
+  homeLocationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -704,6 +726,7 @@ export type CustomerCreateWithoutLocationProfilesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   waiverSignatures?: Prisma.WaiverSignatureCreateNestedManyWithoutCustomerInput
@@ -728,6 +751,7 @@ export type CustomerUncheckedCreateWithoutLocationProfilesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   waiverSignatures?: Prisma.WaiverSignatureUncheckedCreateNestedManyWithoutCustomerInput
@@ -768,6 +792,7 @@ export type CustomerUpdateWithoutLocationProfilesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   waiverSignatures?: Prisma.WaiverSignatureUpdateManyWithoutCustomerNestedInput
@@ -792,6 +817,7 @@ export type CustomerUncheckedUpdateWithoutLocationProfilesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   waiverSignatures?: Prisma.WaiverSignatureUncheckedUpdateManyWithoutCustomerNestedInput
@@ -816,6 +842,7 @@ export type CustomerCreateWithoutWaiverSignaturesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -840,6 +867,7 @@ export type CustomerUncheckedCreateWithoutWaiverSignaturesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -869,6 +897,7 @@ export type CustomerCreateWithoutMinorSignaturesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -893,6 +922,7 @@ export type CustomerUncheckedCreateWithoutMinorSignaturesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -933,6 +963,7 @@ export type CustomerUpdateWithoutWaiverSignaturesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -957,6 +988,7 @@ export type CustomerUncheckedUpdateWithoutWaiverSignaturesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -992,6 +1024,7 @@ export type CustomerUpdateWithoutMinorSignaturesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1016,6 +1049,7 @@ export type CustomerUncheckedUpdateWithoutMinorSignaturesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1040,6 +1074,7 @@ export type CustomerCreateWithoutBookingsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1064,6 +1099,7 @@ export type CustomerUncheckedCreateWithoutBookingsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1104,6 +1140,7 @@ export type CustomerUpdateWithoutBookingsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1128,6 +1165,7 @@ export type CustomerUncheckedUpdateWithoutBookingsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1152,6 +1190,7 @@ export type CustomerCreateWithoutOrdersInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1176,6 +1215,7 @@ export type CustomerUncheckedCreateWithoutOrdersInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1216,6 +1256,7 @@ export type CustomerUpdateWithoutOrdersInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1240,6 +1281,7 @@ export type CustomerUncheckedUpdateWithoutOrdersInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1264,6 +1306,7 @@ export type CustomerCreateWithoutDiscountRedemptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1288,6 +1331,7 @@ export type CustomerUncheckedCreateWithoutDiscountRedemptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1328,6 +1372,7 @@ export type CustomerUpdateWithoutDiscountRedemptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1352,6 +1397,7 @@ export type CustomerUncheckedUpdateWithoutDiscountRedemptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1376,6 +1422,7 @@ export type CustomerCreateWithoutSubscriptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1400,6 +1447,7 @@ export type CustomerUncheckedCreateWithoutSubscriptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1429,6 +1477,7 @@ export type CustomerCreateWithoutGiftedSubscriptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1453,6 +1502,7 @@ export type CustomerUncheckedCreateWithoutGiftedSubscriptionsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1493,6 +1543,7 @@ export type CustomerUpdateWithoutSubscriptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1517,6 +1568,7 @@ export type CustomerUncheckedUpdateWithoutSubscriptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1552,6 +1604,7 @@ export type CustomerUpdateWithoutGiftedSubscriptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1576,6 +1629,7 @@ export type CustomerUncheckedUpdateWithoutGiftedSubscriptionsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1600,6 +1654,7 @@ export type CustomerCreateWithoutPurchasedGiftCardsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1624,6 +1679,7 @@ export type CustomerUncheckedCreateWithoutPurchasedGiftCardsInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1664,6 +1720,7 @@ export type CustomerUpdateWithoutPurchasedGiftCardsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1688,6 +1745,7 @@ export type CustomerUncheckedUpdateWithoutPurchasedGiftCardsInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1712,6 +1770,7 @@ export type CustomerCreateWithoutPackBalancesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1736,6 +1795,7 @@ export type CustomerUncheckedCreateWithoutPackBalancesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1776,6 +1836,7 @@ export type CustomerUpdateWithoutPackBalancesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1800,6 +1861,7 @@ export type CustomerUncheckedUpdateWithoutPackBalancesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -1824,6 +1886,7 @@ export type CustomerCreateWithoutStoredValueEntriesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileCreateNestedManyWithoutCustomerInput
@@ -1848,6 +1911,7 @@ export type CustomerUncheckedCreateWithoutStoredValueEntriesInput = {
   dateOfBirth?: Date | string | null
   authUserId?: string | null
   stripeCustomerId?: string | null
+  homeLocationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedCreateNestedManyWithoutCustomerInput
@@ -1888,6 +1952,7 @@ export type CustomerUpdateWithoutStoredValueEntriesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUpdateManyWithoutCustomerNestedInput
@@ -1912,6 +1977,7 @@ export type CustomerUncheckedUpdateWithoutStoredValueEntriesInput = {
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  homeLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   locationProfiles?: Prisma.CustomerLocationProfileUncheckedUpdateManyWithoutCustomerNestedInput
@@ -2057,6 +2123,7 @@ export type CustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   dateOfBirth?: boolean
   authUserId?: boolean
   stripeCustomerId?: boolean
+  homeLocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   locationProfiles?: boolean | Prisma.Customer$locationProfilesArgs<ExtArgs>
@@ -2083,6 +2150,7 @@ export type CustomerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dateOfBirth?: boolean
   authUserId?: boolean
   stripeCustomerId?: boolean
+  homeLocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["customer"]>
@@ -2097,6 +2165,7 @@ export type CustomerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   dateOfBirth?: boolean
   authUserId?: boolean
   stripeCustomerId?: boolean
+  homeLocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["customer"]>
@@ -2111,11 +2180,12 @@ export type CustomerSelectScalar = {
   dateOfBirth?: boolean
   authUserId?: boolean
   stripeCustomerId?: boolean
+  homeLocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CustomerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kind" | "firstName" | "lastName" | "phone" | "email" | "dateOfBirth" | "authUserId" | "stripeCustomerId" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
+export type CustomerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kind" | "firstName" | "lastName" | "phone" | "email" | "dateOfBirth" | "authUserId" | "stripeCustomerId" | "homeLocationId" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
 export type CustomerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   locationProfiles?: boolean | Prisma.Customer$locationProfilesArgs<ExtArgs>
   waiverSignatures?: boolean | Prisma.Customer$waiverSignaturesArgs<ExtArgs>
@@ -2161,6 +2231,11 @@ export type $CustomerPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     dateOfBirth: Date | null
     authUserId: string | null
     stripeCustomerId: string | null
+    /**
+     * Preferred "home" studio — plain scalar by design (no FK), synced from the
+     * client's localStorage choice when a customer session exists.
+     */
+    homeLocationId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["customer"]>
@@ -2606,6 +2681,7 @@ export interface CustomerFieldRefs {
   readonly dateOfBirth: Prisma.FieldRef<"Customer", 'DateTime'>
   readonly authUserId: Prisma.FieldRef<"Customer", 'String'>
   readonly stripeCustomerId: Prisma.FieldRef<"Customer", 'String'>
+  readonly homeLocationId: Prisma.FieldRef<"Customer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Customer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Customer", 'DateTime'>
 }

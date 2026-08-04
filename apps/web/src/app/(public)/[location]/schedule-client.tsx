@@ -3,12 +3,14 @@
 /**
  * The Schedule screen — the workhorse. Sessions tab: 14-day date strip +
  * guest stepper (pinned) + slot list. Buyout tab: duration picker + windows.
- * Membership / Gift Cards render disabled ("coming soon").
+ * Membership tab: plan + punch-pass listing (purchase is Phase 3). Gift Cards
+ * render disabled ("coming soon").
  */
 
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { MembershipPlans } from '@/components/booking/membership-plans'
 import { DateStrip, SlotPicker } from '@/components/booking/slot-picker'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,7 +24,7 @@ type Tab = 'sessions' | 'buyout' | 'membership' | 'giftcards'
 const TABS: Array<{ id: Tab; label: string; enabled: boolean }> = [
   { id: 'sessions', label: 'Sessions', enabled: true },
   { id: 'buyout', label: 'Private Buyout', enabled: true },
-  { id: 'membership', label: 'Membership', enabled: false },
+  { id: 'membership', label: 'Membership', enabled: true },
   { id: 'giftcards', label: 'Gift Cards', enabled: false },
 ]
 
@@ -92,6 +94,10 @@ export function ScheduleClient({
         </div>
       ) : tab === 'buyout' ? (
         <BuyoutTab location={location} options={buyoutOptions} />
+      ) : tab === 'membership' ? (
+        // Provo's prices are real Momence prices; the rest of the network shows
+        // provisional pricing, so everywhere but Provo gets the footnote.
+        <MembershipPlans locationSlug={location.slug} pricesConfirmed={location.slug === 'provo'} />
       ) : null}
     </div>
   )

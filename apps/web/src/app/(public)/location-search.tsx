@@ -5,11 +5,18 @@
  * list by city, state, or zip as the user types. Ranking per query token:
  * zip prefix > city prefix > city substring > state > name substring; every
  * token must match somewhere or the location drops out.
+ *
+ * A heart on each card marks the visitor's "home studio" (localStorage, plus
+ * server-side for signed-in customers). With no query typed the home studio is
+ * pinned in a "Your studio" section above the list; during a search it ranks
+ * like any other location and only appears when it matches the query.
  */
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { HomeHeartButton } from '@/components/home/home-heart-button'
 import { Input } from '@/components/ui/input'
+import { useHomeLocation } from '@/lib/home-location'
 
 export interface ChooserLocation {
   id: string
@@ -49,8 +56,69 @@ function tokenScore(location: ChooserLocation, token: string): number {
   return 0
 }
 
+function LocationCard({
+  location,
+  isHome,
+  pinned = false,
+  onToggleHome,
+}: {
+  location: ChooserLocation
+  isHome: boolean
+  pinned?: boolean
+  onToggleHome: () => void
+}) {
+  const external = location.bookingProvider === 'MOMENCE'
+  const inner = (
+    <span className="flex min-h-11 items-center justify-between gap-4">
+      <span className="flex flex-col">
+        <span className="text-lg font-semibold tracking-tight">{location.name}</span>
+        <span className="text-sm text-gray-500">
+          {location.city}, {location.state} {location.postalCode}
+        </span>
+      </span>
+      <span className="flex items-center gap-2">
+        {pinned ? (
+          <span className="text-sm font-medium text-ink">Book at your studio</span>
+        ) : external ? (
+          <span className="text-xs text-gray-400">books on plunj.co</span>
+        ) : (
+          <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-medium text-paper">
+            Book here
+          </span>
+        )}
+        <span aria-hidden className="text-gray-300">
+          {external ? '↗' : '→'}
+        </span>
+      </span>
+    </span>
+  )
+  const cardClass = `block rounded-card border bg-white py-4 pl-5 pr-14 transition-colors hover:border-gray-300 active:bg-gray-50 ${
+    pinned ? 'border-gray-300' : 'border-gray-100'
+  }`
+  return (
+    <li className="relative">
+      {external && location.momenceUrl ? (
+        <a href={location.momenceUrl} className={cardClass}>
+          {inner}
+        </a>
+      ) : (
+        <Link href={`/${location.slug}`} className={cardClass}>
+          {inner}
+        </Link>
+      )}
+      <HomeHeartButton
+        active={isHome}
+        locationName={location.name}
+        onToggle={onToggleHome}
+        className="absolute right-1.5 top-1/2 -translate-y-1/2"
+      />
+    </li>
+  )
+}
+
 export function LocationSearch({ locations }: { locations: ChooserLocation[] }) {
   const [query, setQuery] = useState('')
+  const { homeSlug, ready, setHome } = useHomeLocation()
 
   const results = useMemo(() => {
     // Locations booking natively here list first; Momence-routed ones follow.
@@ -75,6 +143,19 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
       .map((r) => r.location)
   }, [locations, query])
 
+  const searching = query.trim().length > 0
+  const home =
+    ready && homeSlug !== null ? (locations.find((l) => l.slug === homeSlug) ?? null) : null
+  // Pin the home studio only while no query is typed; during a search it ranks
+  // like any other location (and drops out when it doesn't match).
+  const pinnedHome = searching ? null : home
+  const listResults = pinnedHome
+    ? results.filter((location) => location.slug !== pinnedHome.slug)
+    : results
+
+  const toggleHome = (location: ChooserLocation) =>
+    setHome(homeSlug === location.slug ? null : location.slug)
+
   return (
     <div className="flex flex-col gap-4">
       <Input
@@ -86,52 +167,36 @@ export function LocationSearch({ locations }: { locations: ChooserLocation[] }) 
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {results.length === 0 ? (
-        <p className="py-4 text-gray-500">
-          No studios match &ldquo;{query.trim()}&rdquo; — try a city, state, or zip code.
-        </p>
+      {pinnedHome ? (
+        <section aria-label="Your studio" className="flex flex-col gap-2">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">Your studio</h2>
+          <ul className="flex flex-col gap-3">
+            <LocationCard
+              location={pinnedHome}
+              isHome
+              pinned
+              onToggleHome={() => toggleHome(pinnedHome)}
+            />
+          </ul>
+        </section>
+      ) : null}
+
+      {listResults.length === 0 ? (
+        searching ? (
+          <p className="py-4 text-gray-500">
+            No studios match &ldquo;{query.trim()}&rdquo; — try a city, state, or zip code.
+          </p>
+        ) : null
       ) : (
         <ul className="flex flex-col gap-3">
-          {results.map((location) => {
-            const external = location.bookingProvider === 'MOMENCE'
-            const inner = (
-              <span className="flex min-h-11 items-center justify-between gap-4">
-                <span className="flex flex-col">
-                  <span className="text-lg font-semibold tracking-tight">{location.name}</span>
-                  <span className="text-sm text-gray-500">
-                    {location.city}, {location.state} {location.postalCode}
-                  </span>
-                </span>
-                <span className="flex items-center gap-2">
-                  {external ? (
-                    <span className="text-xs text-gray-400">books on plunj.co</span>
-                  ) : (
-                    <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-medium text-paper">
-                      Book here
-                    </span>
-                  )}
-                  <span aria-hidden className="text-gray-300">
-                    {external ? '↗' : '→'}
-                  </span>
-                </span>
-              </span>
-            )
-            const cardClass =
-              'block rounded-card border border-gray-100 bg-white px-5 py-4 transition-colors hover:border-gray-300 active:bg-gray-50'
-            return (
-              <li key={location.id}>
-                {location.bookingProvider === 'MOMENCE' && location.momenceUrl ? (
-                  <a href={location.momenceUrl} className={cardClass}>
-                    {inner}
-                  </a>
-                ) : (
-                  <Link href={`/${location.slug}`} className={cardClass}>
-                    {inner}
-                  </Link>
-                )}
-              </li>
-            )
-          })}
+          {listResults.map((location) => (
+            <LocationCard
+              key={location.id}
+              location={location}
+              isHome={location.slug === homeSlug}
+              onToggleHome={() => toggleHome(location)}
+            />
+          ))}
         </ul>
       )}
     </div>
