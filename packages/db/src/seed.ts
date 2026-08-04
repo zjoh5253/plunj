@@ -30,6 +30,62 @@ function startHoursForDay(dayOfWeek: number): number[] {
   return Array.from({ length: lastStart - open + 1 }, (_, i) => open + i)
 }
 
+const WAIVER_DOCS = [
+  { kind: 'LIABILITY', title: 'Waiver and Release of Liability', body: LIABILITY_WAIVER_MARKDOWN },
+  { kind: 'MINOR_CONSENT', title: 'Parent / Guardian Consent', body: MINOR_CONSENT_MARKDOWN },
+  { kind: 'PRIVACY', title: 'Privacy Policy', body: PRIVACY_POLICY_MARKDOWN },
+] as const
+
+async function seedWaiverDocs(locationId: string): Promise<void> {
+  for (const waiver of WAIVER_DOCS) {
+    await prisma.waiverDocument.upsert({
+      where: { locationId_kind_version: { locationId, kind: waiver.kind, version: 1 } },
+      create: {
+        id: id(),
+        locationId,
+        kind: waiver.kind,
+        version: 1,
+        title: waiver.title,
+        bodyMarkdown: waiver.body,
+        contentSha256: sha256(waiver.body),
+        publishedAt: new Date(),
+        active: true,
+      },
+      update: {
+        title: waiver.title,
+        bodyMarkdown: waiver.body,
+        contentSha256: sha256(waiver.body),
+      },
+    })
+  }
+}
+
+/**
+ * "06:00-22:30" or "06:00-11:30,16:30-20:30" → hourly session start times
+ * ("HH:MM") for 60-minute sessions: from each range's open, every 60 minutes,
+ * while the session still ends by close. Handles half-hour boundaries.
+ */
+function startTimesFromHours(value: string | null | undefined): string[] {
+  if (!value) return []
+  const toMin = (t: string): number => {
+    const [h, m] = t.split(':').map(Number)
+    return (h ?? 0) * 60 + (m ?? 0)
+  }
+  const starts: string[] = []
+  for (const range of value.split(',')) {
+    const [open, close] = range.trim().split('-')
+    if (!open || !close) continue
+    for (let t = toMin(open); t + 60 <= toMin(close); t += 60) {
+      starts.push(
+        `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`,
+      )
+    }
+  }
+  return starts
+}
+
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
+
 async function main() {
   // --- Organization (single row) ---------------------------------------------
   const org =
@@ -127,34 +183,9 @@ async function main() {
   }
 
   // --- Waiver documents (real PLUNJ content, see waiver-content.ts) -----------
-  const waivers = [
-    { kind: 'LIABILITY', title: 'Waiver and Release of Liability', body: LIABILITY_WAIVER_MARKDOWN },
-    { kind: 'MINOR_CONSENT', title: 'Parent / Guardian Consent', body: MINOR_CONSENT_MARKDOWN },
-    { kind: 'PRIVACY', title: 'Privacy Policy', body: PRIVACY_POLICY_MARKDOWN },
-  ] as const
-  for (const waiver of waivers) {
-    await prisma.waiverDocument.upsert({
-      where: {
-        locationId_kind_version: { locationId: provo.id, kind: waiver.kind, version: 1 },
-      },
-      create: {
-        id: id(),
-        locationId: provo.id,
-        kind: waiver.kind,
-        version: 1,
-        title: waiver.title,
-        bodyMarkdown: waiver.body,
-        contentSha256: sha256(waiver.body),
-        publishedAt: new Date(),
-        active: true,
-      },
-      update: {
-        title: waiver.title,
-        bodyMarkdown: waiver.body,
-        contentSha256: sha256(waiver.body),
-      },
-    })
-  }
+  // The "new waiver per location" business rule means every internal location
+  // publishes its own copy of the corporate documents.
+  await seedWaiverDocs(provo.id)
 
   // --- Discount codes for testing --------------------------------------------
   const discountCodes = [
@@ -182,16 +213,25 @@ async function main() {
   // sign in. Replace with real numbers before the pilot.
   const staff = [
     {
+      name: 'PLUNJ Corporate',
+      email: 'corporate@plunj.example',
+      phone: '+15550100000',
+      role: 'CORPORATE_ADMIN',
+      locationId: null,
+    },
+    {
       name: 'Provo Owner',
       email: 'owner@provo.plunj.example',
       phone: '+15550100001',
       role: 'LOCATION_OWNER',
+      locationId: provo.id,
     },
     {
       name: 'Provo Front Desk',
       email: 'frontdesk@provo.plunj.example',
       phone: '+15550100002',
       role: 'FRONT_DESK',
+      locationId: provo.id,
     },
   ] as const
   for (const member of staff) {
@@ -206,21 +246,31 @@ async function main() {
       },
       update: { name: member.name, phone: member.phone, active: true },
     })
-    await prisma.staffRole.upsert({
-      where: {
-        staffUserId_role_locationId: {
+    // CORPORATE_ADMIN roles carry a NULL locationId, which the composite unique
+    // treats as distinct — find-or-create instead of upsert.
+    const existingRole = await prisma.staffRole.findFirst({
+      where: { staffUserId: staffUser.id, role: member.role, locationId: member.locationId },
+    })
+    if (!existingRole) {
+      await prisma.staffRole.create({
+        data: {
+          id: id(),
           staffUserId: staffUser.id,
           role: member.role,
-          locationId: provo.id,
+          locationId: member.locationId,
         },
-      },
-      create: { id: id(), staffUserId: staffUser.id, role: member.role, locationId: provo.id },
-      update: {},
-    })
+      })
+    }
   }
 
-  // --- The rest of the network (Momence-routed until each cutover) ------------
+  // --- The rest of the network -------------------------------------------------
+  // Demo mode: every ACTIVE location books internally. Studios, waiver docs,
+  // and session templates are derived from the scraped hours; drop-in price
+  // defaults to Provo's confirmed $45 — REAL PER-LOCATION PRICES ARE UNKNOWN
+  // (not published on plunj.co) and must be corrected before any real cutover.
+  const DEFAULT_PRICE_CENTS = 4500
   for (const loc of MOMENCE_LOCATIONS) {
+    const active = loc.status === 'ACTIVE'
     const data = {
       orgId: org.id,
       name: loc.name,
@@ -234,24 +284,105 @@ async function main() {
       email: loc.email,
       status: loc.status,
       taxRateBps: loc.taxRateBps,
-      bookingProvider: 'MOMENCE',
-      // No public Momence booking URL exists (the widget is client-rendered),
-      // so route to the location page's booking anchor — today's real flow.
+      bookingProvider: active ? 'INTERNAL' : 'MOMENCE',
       momenceUrl: `https://plunj.co/locations/${loc.slug}#booking`,
       settings: loc.settings as Prisma.InputJsonObject,
     } as const
-    await prisma.location.upsert({
+    const location = await prisma.location.upsert({
       where: { slug: loc.slug },
       create: { id: id(), slug: loc.slug, ...data },
       update: data,
     })
+    if (!active) continue
+
+    const locStudio =
+      (await prisma.studio.findFirst({
+        where: { locationId: location.id, name: 'Contrast Suite' },
+      })) ??
+      (await prisma.studio.create({
+        data: {
+          id: id(),
+          locationId: location.id,
+          name: 'Contrast Suite',
+          kind: 'CONTRAST_SUITE',
+          defaultCapacity: 8,
+          active: true,
+        },
+      }))
+
+    // Templates from scraped hours; locations with no published hours (Logan)
+    // fall back to Provo-style hours so they're bookable in the demo.
+    const hours = (loc.settings.hours ?? null) as Record<string, string | null> | null
+    for (let dayOfWeek = 0; dayOfWeek <= 6; dayOfWeek++) {
+      const startTimes = hours
+        ? startTimesFromHours(hours[DAY_KEYS[dayOfWeek]!])
+        : startHoursForDay(dayOfWeek).map(hourToLocalTime)
+      for (const startTimeLocal of startTimes) {
+        await prisma.sessionTemplate.upsert({
+          where: {
+            studioId_dayOfWeek_startTimeLocal_effectiveFrom: {
+              studioId: locStudio.id,
+              dayOfWeek,
+              startTimeLocal,
+              effectiveFrom: EFFECTIVE_FROM,
+            },
+          },
+          create: {
+            id: id(),
+            studioId: locStudio.id,
+            locationId: location.id,
+            dayOfWeek,
+            startTimeLocal,
+            durationMin: 60,
+            offeringType: 'COMMUNAL',
+            priceCents: DEFAULT_PRICE_CENTS,
+            effectiveFrom: EFFECTIVE_FROM,
+            active: true,
+          },
+          update: { active: true },
+        })
+      }
+    }
+
+    // Buyout tiers from scraped data (numeric tiers only).
+    const scrapedBuyouts = (loc.settings.buyouts ?? []) as Array<{
+      hours?: number
+      priceUsd?: number
+      maxGuests?: number
+    }>
+    for (const tier of scrapedBuyouts) {
+      if (typeof tier.hours !== 'number' || typeof tier.priceUsd !== 'number') continue
+      const existing = await prisma.buyoutOption.findFirst({
+        where: { locationId: location.id, durationHours: tier.hours },
+      })
+      const tierData = {
+        priceCents: tier.priceUsd * 100,
+        maxGuests: tier.maxGuests ?? 10,
+        active: true,
+      }
+      if (existing) {
+        await prisma.buyoutOption.update({ where: { id: existing.id }, data: tierData })
+      } else {
+        await prisma.buyoutOption.create({
+          data: {
+            id: id(),
+            locationId: location.id,
+            durationHours: tier.hours,
+            ...tierData,
+          },
+        })
+      }
+    }
+
+    await seedWaiverDocs(location.id)
   }
 
   console.log(
     `Seeded: org ${org.name}, location ${provo.slug}, studio ${studio.name}, ` +
       `${templateCount} session templates, ${buyouts.length} buyout options, ` +
-      `${waivers.length} waiver documents, ${discountCodes.length} discount codes, ` +
-      `${staff.length} staff users, ${MOMENCE_LOCATIONS.length} Momence-routed locations`,
+      `${WAIVER_DOCS.length} waiver documents per internal location, ` +
+      `${discountCodes.length} discount codes, ${staff.length} staff users, ` +
+      `${MOMENCE_LOCATIONS.length} network locations`,
   )
 }
 
